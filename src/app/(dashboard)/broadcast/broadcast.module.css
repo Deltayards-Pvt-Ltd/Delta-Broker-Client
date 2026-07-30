@@ -191,118 +191,7 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.55rem;
-}
-
-/* Broadcast row: title + date */
-.row {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.85rem 1rem;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-}
-
-.rowMain {
-  min-width: 0;
-  flex: 1;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.5rem 1rem;
-  text-align: left;
-  border: none;
-  background: transparent;
-  padding: 0;
-  cursor: pointer;
-  color: inherit;
-  font: inherit;
-}
-
-.rowMain:hover .rowTitle {
-  color: var(--primary);
-}
-
-.rowTitle {
-  margin: 0;
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--ink);
-}
-
-.rowDate {
-  font-size: 0.78rem;
-  color: var(--ink-faint);
-  white-space: nowrap;
-}
-
-.delete {
-  flex-shrink: 0;
-  min-height: 34px;
-  padding: 0.35rem 0.7rem;
-  border-radius: 8px;
-  border: 1px solid var(--danger-border);
-  background: transparent;
-  color: var(--danger);
-  font-size: 0.78rem;
-  font-weight: 650;
-  cursor: pointer;
-}
-
-.delete:hover {
-  background: var(--danger-bg);
-}
-
-/* Updates inbox rows */
-.updateItem {
-  width: 100%;
-  display: block;
-  text-align: left;
-  padding: 0.95rem 1.05rem;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  cursor: pointer;
-  color: inherit;
-  font: inherit;
-}
-
-.updateItem:hover {
-  border-color: var(--line-hover);
-}
-
-.updateUnread {
-  border-color: rgba(197, 160, 89, 0.45);
-  background: rgba(197, 160, 89, 0.06);
-}
-
-.updateTop {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.45rem 0.75rem;
-}
-
-.updateMsg {
-  margin: 0.4rem 0 0;
-  font-size: 0.86rem;
-  color: var(--ink-muted);
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--primary);
-  flex-shrink: 0;
+  gap: 0.65rem;
 }
 
 .openLink {
@@ -323,14 +212,6 @@
 }
 
 @media (max-width: 640px) {
-  .row {
-    flex-wrap: wrap;
-  }
-
-  .delete {
-    margin-left: auto;
-  }
-
   .segment {
     width: 100%;
   }

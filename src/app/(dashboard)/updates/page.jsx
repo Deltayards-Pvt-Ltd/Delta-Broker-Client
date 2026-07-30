@@ -9,19 +9,10 @@ import {
   markNotificationRead,
   notificationHref,
 } from "@/lib/notificationApi";
+import FeedCard, { metaFromUpdate } from "@/app/component/FeedCard";
 import UpdateDetailModal from "@/app/component/UpdateDetailModal";
 import Pagination from "@/app/component/Pagination";
 import styles from "./updates.module.css";
-
-function timeLabel(date) {
-  if (!date) return "";
-  return new Date(date).toLocaleString(undefined, {
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-}
 
 const PAGE_SIZE = 10;
 
@@ -142,22 +133,23 @@ export default function UpdatesPage() {
         <div className={styles.empty}>No updates yet.</div>
       ) : (
         <ul className={styles.list}>
-          {items.map((n) => (
-            <li key={n._id}>
-              <button
-                type="button"
-                className={`${styles.item} ${n.read ? "" : styles.itemUnread}`}
-                onClick={() => onOpen(n)}
-              >
-                <div className={styles.itemTop}>
-                  <p className={styles.itemTitle}>{n.title}</p>
-                  <span className={styles.meta}>{timeLabel(n.createdAt)}</span>
-                  {!n.read ? <span className={styles.dot} aria-label="Unread" /> : null}
-                </div>
-                <p className={styles.itemBody}>{n.message}</p>
-              </button>
-            </li>
-          ))}
+          {items.map((n) => {
+            const meta = metaFromUpdate(n);
+            return (
+              <li key={n._id}>
+                <FeedCard
+                  category={meta.label}
+                  Icon={meta.Icon}
+                  title={n.title}
+                  message={n.message}
+                  createdAt={n.createdAt}
+                  link={meta.link}
+                  unread={meta.unread}
+                  onClick={() => onOpen(n)}
+                />
+              </li>
+            );
+          })}
         </ul>
       )}
 

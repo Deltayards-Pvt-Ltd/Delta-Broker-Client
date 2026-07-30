@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
@@ -9,6 +9,7 @@ import {
   downloadBrochure,
   downloadGalleryZip,
   downloadLayoutImage,
+  downloadWalkthroughVideo,
 } from "@/lib/downloadAsset";
 import styles from "../projects.module.css";
 
@@ -36,6 +37,8 @@ export default function ProjectDetailPage() {
   const [busy, setBusy] = useState("");
   const [showAllFeatures, setShowAllFeatures] = useState(false);
   const [showAllGallery, setShowAllGallery] = useState(false);
+  const walkthroughRef = useRef(null);
+  const audioUnlockedRef = useRef(false);
 
   const FEATURE_LIMIT = 6;
   const GALLERY_LIMIT = 6;
@@ -62,6 +65,59 @@ export default function ProjectDetailPage() {
       alive = false;
     };
   }, [id]);
+
+  useEffect(() => {
+    const unlock = () => {
+      audioUnlockedRef.current = true;
+      const video = walkthroughRef.current;
+      if (!video) return;
+      video.muted = false;
+      video.volume = 1;
+    };
+    window.addEventListener("pointerdown", unlock, { once: true });
+    window.addEventListener("keydown", unlock, { once: true });
+    return () => {
+      window.removeEventListener("pointerdown", unlock);
+      window.removeEventListener("keydown", unlock);
+    };
+  }, []);
+
+  useEffect(() => {
+    const video = walkthroughRef.current;
+    if (!video || !project?.walkthroughVideo) return;
+
+    const playWithSound = async () => {
+      video.muted = false;
+      video.volume = 1;
+      try {
+        await video.play();
+      } catch {
+        if (!audioUnlockedRef.current) {
+          video.muted = true;
+          try {
+            await video.play();
+          } catch {
+            /* ignore */
+          }
+        }
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          playWithSound();
+        } else {
+          video.pause();
+          video.muted = true;
+        }
+      },
+      { threshold: 0.45 }
+    );
+
+    observer.observe(video);
+    return () => observer.disconnect();
+  }, [project?.walkthroughVideo]);
 
   const detailRows = useMemo(() => {
     if (!project) return [];
@@ -113,6 +169,28 @@ export default function ProjectDetailPage() {
       alert(err.message || "Download failed");
     } finally {
       setBusy("");
+    }
+  };
+
+  const shareWalkthrough = async () => {
+    const url = project?.walkthroughVideo;
+    if (!url) return;
+    const title = `${project.name} — Walkthrough`;
+    try {
+      if (navigator.share) {
+        await navigator.share({ title, url, text: title });
+        return;
+      }
+      await navigator.clipboard.writeText(url);
+      alert("Walkthrough link copied");
+    } catch (err) {
+      if (err?.name === "AbortError") return;
+      try {
+        await navigator.clipboard.writeText(url);
+        alert("Walkthrough link copied");
+      } catch {
+        alert("Could not share");
+      }
     }
   };
 
@@ -198,6 +276,77 @@ export default function ProjectDetailPage() {
         </section>
       ) : null}
 
+      {project.walkthroughVideo ? (
+        <section className={styles.walkthroughSection}>
+          <h2 className={styles.sectionTitle}>Walkthrough Video</h2>
+          <div className={styles.walkthroughWrap}>
+            <video
+              ref={walkthroughRef}
+              className={styles.walkthroughVideo}
+              src={project.walkthroughVideo}
+              playsInline
+              loop
+              preload="metadata"
+              controls
+              muted
+            />
+          </div>
+          <div className={styles.walkthroughActions}>
+            <button
+              type="button"
+              className={styles.walkthroughAction}
+              onClick={shareWalkthrough}
+            >
+              <span>Share:</span>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden
+              >
+                <circle cx="18" cy="5" r="2.5" stroke="currentColor" strokeWidth="1.75" />
+                <circle cx="6" cy="12" r="2.5" stroke="currentColor" strokeWidth="1.75" />
+                <circle cx="18" cy="19" r="2.5" stroke="currentColor" strokeWidth="1.75" />
+                <path
+                  d="M8.2 10.8 15.8 6.2M8.2 13.2l7.6 4.6"
+                  stroke="currentColor"
+                  strokeWidth="1.75"
+                  strokeLinecap="round"
+                />
+              </svg>
+            </button>
+            <button
+              type="button"
+              className={styles.walkthroughAction}
+              disabled={busy === "walkthrough"}
+              onClick={() =>
+                runDownload("walkthrough", () =>
+                  downloadWalkthroughVideo(project)
+                )
+              }
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                aria-hidden
+              >
+                <path
+                  d="M12 4v12m0 0 4.5-4.5M12 16l-4.5-4.5M5 20h14"
+                  stroke="currentColor"
+                  strokeWidth="1.75"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              {busy === "walkthrough" ? "Downloading…" : "DOWNLOAD VIDEO"}
+            </button>
+          </div>
+        </section>
+      ) : null}
+
       {allGallery.length ? (
         <section className={styles.panel}>
           <div className={styles.sectionHead}>
@@ -268,23 +417,36 @@ export default function ProjectDetailPage() {
                 <span className={styles.layoutTabTitle}>
                   {l.title || `Layout ${i + 1}`}
                 </span>
-                {l.area ? (
-                  <span className={styles.layoutTabMeta}>{l.area} sq.ft</span>
-                ) : null}
               </button>
             ))}
           </div>
-          <div className={styles.layoutStage}>
-            {activeLayoutSrc ? (
-              // eslint-disable-next-line @next/next/no-img-element
+          <div className={styles.layoutMetaRow}>
+            <div className={styles.layoutMetaLeft}>
+              <span className={styles.layoutMetaLabel}>Selected layout</span>
+              <span className={styles.layoutMetaValue}>
+                {activeLayout?.title || `Layout ${layoutIndex + 1}`}
+              </span>
+            </div>
+            {activeLayout?.area ? (
+              <div className={styles.layoutMetaRight}>
+                <span className={styles.layoutMetaValue}>
+                  {activeLayout.area} sq.ft.
+                </span>
+                <span className={styles.layoutMetaHint}>(Carpet Area)</span>
+              </div>
+            ) : null}
+          </div>
+          {activeLayoutSrc ? (
+            <div className={styles.layoutStage}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={activeLayoutSrc}
                 alt={activeLayout?.title || "Layout"}
               />
-            ) : (
-              <p className={styles.muted}>No layout image</p>
-            )}
-          </div>
+            </div>
+          ) : (
+            <p className={styles.muted}>Image is not available</p>
+          )}
         </section>
       ) : null}
 
@@ -303,9 +465,9 @@ export default function ProjectDetailPage() {
         </section>
       ) : null}
 
-      {(brochures.length || project.walkthroughVideo) && (
+      {brochures.length ? (
         <section className={styles.panel}>
-          <h2 className={styles.sectionTitle}>Documents & video</h2>
+          <h2 className={styles.sectionTitle}>Documents</h2>
           <div className={styles.docList}>
             {brochures.map((b, i) => (
               <div key={b._id || b.file} className={styles.docRow}>
@@ -326,22 +488,9 @@ export default function ProjectDetailPage() {
                 </button>
               </div>
             ))}
-            {project.walkthroughVideo ? (
-              <div className={styles.docRow}>
-                <span className={styles.docLabel}>Walkthrough video</span>
-                <a
-                  className={styles.dlBtn}
-                  href={project.walkthroughVideo}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Open
-                </a>
-              </div>
-            ) : null}
           </div>
         </section>
-      )}
+      ) : null}
     </div>
   );
 }

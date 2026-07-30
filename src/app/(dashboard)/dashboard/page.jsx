@@ -228,6 +228,10 @@ export default function HomePage() {
                 <strong>Projects</strong>
                 <span>Browse projects</span>
               </Link>
+              <Link href="/profile" className={styles.quickCard}>
+                <strong>Account</strong>
+                <span>Signed-in admin & logout</span>
+              </Link>
             </>
           ) : (
             <>
@@ -236,8 +240,8 @@ export default function HomePage() {
                 <span>Active inventory & details</span>
               </Link>
               <Link href="/profile" className={styles.quickCard}>
-                <strong>Your profile</strong>
-                <span>Email, mobile, RERA & membership</span>
+                <strong>Your account</strong>
+                <span>Membership & contact details</span>
               </Link>
             </>
           )}

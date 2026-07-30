@@ -448,6 +448,78 @@
   text-decoration: underline;
 }
 
+.walkthroughSection {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  text-align: left;
+  padding: 0;
+  gap: 0;
+}
+
+.walkthroughSection > .sectionTitle {
+  margin-bottom: 0.9rem;
+}
+
+.walkthroughWrap {
+  width: 100%;
+  max-width: 880px;
+  margin: 0 auto;
+  border-radius: 1.15rem;
+  overflow: hidden;
+  background: #111;
+  box-shadow: 0 10px 32px rgba(15, 23, 42, 0.11);
+}
+
+.walkthroughVideo {
+  display: block;
+  width: 100%;
+  max-height: min(52vh, 440px);
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: #111;
+}
+
+.walkthroughActions {
+  width: 100%;
+  max-width: 880px;
+  margin: 0.8rem auto 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 0.85rem 1.25rem;
+  padding: 0 0.15rem;
+}
+
+.walkthroughAction {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--ink-body);
+  cursor: pointer;
+}
+
+.walkthroughAction:hover {
+  color: var(--ink);
+}
+
+.walkthroughAction:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.walkthroughAction span {
+  font-weight: 600;
+}
+
 .docList {
   display: flex;
   flex-direction: column;
@@ -618,12 +690,10 @@
   background: var(--surface-muted);
   color: var(--ink-muted);
   border-radius: var(--radius-md);
-  padding: 0.5rem 0.85rem;
+  padding: 0.55rem 0.95rem;
   cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.1rem;
+  display: inline-flex;
+  align-items: center;
   text-align: left;
   font: inherit;
 }
@@ -644,10 +714,48 @@
   font-weight: 700;
 }
 
-.layoutTabMeta {
+.layoutMetaRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-bottom: 0.85rem;
+  margin-bottom: 0.9rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.layoutMetaLeft,
+.layoutMetaRight {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.layoutMetaRight {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.layoutMetaLabel {
   font-size: 0.72rem;
-  font-weight: 600;
-  opacity: 0.85;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.layoutMetaValue {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.25;
+}
+
+.layoutMetaHint {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--ink-muted);
 }
 
 .layoutStage {

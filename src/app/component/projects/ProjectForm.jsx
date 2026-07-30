@@ -1586,86 +1586,127 @@ function TitledFileSection({
   isEdit,
   imagePreview,
 }) {
-  const rowKey = (row) => row.id || row._id;
+  const rowKey = (row) => String(row?.id || row?._id || "");
 
   const addRow = () => {
     const row = {
-      id: Date.now(),
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       title: "",
       [urlKey]: null,
+      fileName: "",
       preview: null,
     };
-    if (isEdit && setNews) setNews((prev) => [...prev, row]);
-    else setExisting((prev) => [...prev, row]);
+    if (isEdit && setNews) setNews((prev) => [...(Array.isArray(prev) ? prev : []), row]);
+    else setExisting((prev) => [...(Array.isArray(prev) ? prev : []), row]);
   };
 
   const renderRow = (row, isNew) => {
     const fileVal = row[urlKey];
-    const hasUrl = typeof fileVal === "string" && fileVal;
-    const hasFile = fileVal instanceof File;
+    const hasUrl = typeof fileVal === "string" && !!fileVal;
+    const hasFile = typeof File !== "undefined" && fileVal instanceof File;
     const key = rowKey(row);
+    const label =
+      (hasFile && (row.fileName || fileVal.name)) ||
+      (hasUrl ? "On file" : "No file");
+
     const apply = (updater) => {
-      if (isNew) setNews(updater);
-      else setExisting(updater);
+      if (isNew) {
+        if (typeof setNews === "function") setNews(updater);
+        return;
+      }
+      if (typeof setExisting === "function") setExisting(updater);
     };
 
+    const onPickFile = (e) => {
+      const file = e.target.files?.[0] || null;
+      e.target.value = "";
+
+      let preview = null;
+      if (file && imagePreview) {
+        try {
+          preview = URL.createObjectURL(file);
+        } catch {
+          preview = null;
+        }
+      }
+
+      apply((prev) => {
+        const list = Array.isArray(prev) ? prev : [];
+        return list.map((x) => {
+          if (rowKey(x) !== key) return x;
+          if (x.preview) {
+            try {
+              URL.revokeObjectURL(x.preview);
+            } catch {
+              /* ignore */
+            }
+          }
+          return {
+            ...x,
+            [urlKey]: file,
+            fileName: file?.name || "",
+            preview,
+          };
+        });
+      });
+    };
+
+    // Create: always pick. Edit: only brand-new rows (existing keep URL; add via "Add")
+    const canPick = !isEdit || isNew;
+
     return (
-      <div key={key} className={styles.titledRow}>
+      <div key={key || row.title} className={styles.titledRow}>
         <input
           className={styles.input}
           placeholder="Title"
-          value={row.title}
+          value={row.title || ""}
           onChange={(e) => {
             const v = e.target.value;
-            apply((prev) =>
-              prev.map((x) => (rowKey(x) === key ? { ...x, title: v } : x))
-            );
+            apply((prev) => {
+              const list = Array.isArray(prev) ? prev : [];
+              return list.map((x) =>
+                rowKey(x) === key ? { ...x, title: v } : x
+              );
+            });
           }}
         />
         <div className={styles.titledMeta}>
           {imagePreview && (row.preview || hasUrl) ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={row.preview || fileVal}
+              src={row.preview || (hasUrl ? fileVal : "")}
               alt=""
               className={styles.miniThumb}
             />
           ) : null}
-          <span className={styles.fileName}>
-            {hasFile ? fileVal.name : hasUrl ? "On file" : "No file"}
-          </span>
-          {(!isEdit || isNew) && (
-            <label className={styles.secondaryBtn}>
+          <span className={styles.fileName}>{label}</span>
+          {canPick ? (
+            <label className={`${styles.secondaryBtn} ${styles.filePickWrap}`}>
               <Upload size={14} />
-              File
+              {hasFile || hasUrl ? "Replace" : "File"}
               <input
                 type="file"
                 accept={accept}
                 className={styles.hiddenInput}
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  apply((prev) =>
-                    prev.map((x) => {
-                      if (rowKey(x) !== key) return x;
-                      if (x.preview) URL.revokeObjectURL(x.preview);
-                      return {
-                        ...x,
-                        [urlKey]: file || null,
-                        preview: file ? URL.createObjectURL(file) : null,
-                      };
-                    })
-                  );
-                  e.target.value = "";
-                }}
+                onChange={onPickFile}
               />
             </label>
-          )}
+          ) : null}
           <button
             type="button"
             className={styles.dangerBtn}
             onClick={() => {
-              if (row.preview) URL.revokeObjectURL(row.preview);
-              apply((prev) => prev.filter((x) => rowKey(x) !== key));
+              if (row.preview) {
+                try {
+                  URL.revokeObjectURL(row.preview);
+                } catch {
+                  /* ignore */
+                }
+              }
+              apply((prev) => {
+                const list = Array.isArray(prev) ? prev : [];
+                return list.filter((x) => rowKey(x) !== key);
+              });
             }}
           >
             <Trash2 size={14} />
@@ -1674,6 +1715,9 @@ function TitledFileSection({
       </div>
     );
   };
+
+  const existingRows = Array.isArray(existing) ? existing : [];
+  const newRows = Array.isArray(news) ? news : [];
 
   return (
     <section className={styles.section}>
@@ -1685,8 +1729,8 @@ function TitledFileSection({
         </button>
       </div>
       <div className={styles.stack}>
-        {existing.map((row) => renderRow(row, false))}
-        {isEdit && news ? news.map((row) => renderRow(row, true)) : null}
+        {existingRows.map((row) => renderRow(row, false))}
+        {isEdit ? newRows.map((row) => renderRow(row, true)) : null}
       </div>
     </section>
   );

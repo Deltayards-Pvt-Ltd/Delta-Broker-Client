@@ -78,10 +78,9 @@ export const NAV_ITEMS = [
   },
   {
     id: "profile",
-    label: "Profile",
+    label: "Account",
     href: "/profile",
     icon: "users",
-    roles: [ROLES.BROKER],
   },
 ];
 

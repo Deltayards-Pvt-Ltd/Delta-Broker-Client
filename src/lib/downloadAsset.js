@@ -76,6 +76,17 @@ export async function downloadBrochure(brochure, projectName) {
   await downloadAssetFile(src, `${title}.${ext}`);
 }
 
+export async function downloadWalkthroughVideo(project) {
+  const src = project?.walkthroughVideo;
+  if (!src) return;
+  const title = safeFilename(
+    `${project?.name || "project"}-walkthrough`,
+    "walkthrough"
+  );
+  const ext = guessExt(src, "mp4");
+  await downloadAssetFile(src, `${title}.${ext}`);
+}
+
 export async function downloadGalleryZip(project) {
   const items = (project?.galleryImages || [])
     .map((g) => ({

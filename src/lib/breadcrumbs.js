@@ -10,7 +10,7 @@ export function breadcrumbsFromPath(pathname) {
     notifications: "Updates",
     brokers: "Brokers",
     projects: "Projects",
-    profile: "Profile",
+    profile: "Account",
     approved: "Approved",
     pending: "Pending",
     rejected: "Rejected",

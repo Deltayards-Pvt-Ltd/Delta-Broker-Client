@@ -10,26 +10,16 @@ import {
   markNotificationRead,
   notificationHref,
 } from "@/lib/notificationApi";
+import FeedCard, {
+  metaFromBroadcast,
+  metaFromUpdate,
+} from "@/app/component/FeedCard";
 import UpdateDetailModal from "@/app/component/UpdateDetailModal";
 import SendBroadcastModal from "@/app/component/SendBroadcastModal";
 import Pagination from "@/app/component/Pagination";
 import styles from "./broadcast.module.css";
 
 const PAGE_SIZE = 10;
-
-function timeLabel(date, short = false) {
-  if (!date) return "";
-  if (short) {
-    return new Date(date).toLocaleString(undefined, {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  }
-  return new Date(date).toLocaleString();
-}
 
 export default function BroadcastPage() {
   const router = useRouter();
@@ -253,27 +243,23 @@ export default function BroadcastPage() {
             <div className={styles.empty}>No broadcasts sent yet.</div>
           ) : (
             <ul className={styles.list}>
-              {sent.map((b) => (
-                <li key={b._id} className={styles.row}>
-                  <button
-                    type="button"
-                    className={styles.rowMain}
-                    onClick={() => setSelectedBroadcast(b)}
-                  >
-                    <span className={styles.rowTitle}>{b.title}</span>
-                    <span className={styles.rowDate}>
-                      {b.createdAt ? timeLabel(b.createdAt, true) : ""}
-                    </span>
-                  </button>
-                  <button
-                    type="button"
-                    className={styles.delete}
-                    onClick={() => onDelete(b._id)}
-                  >
-                    Delete
-                  </button>
-                </li>
-              ))}
+              {sent.map((b) => {
+                const meta = metaFromBroadcast(b);
+                return (
+                  <li key={b._id}>
+                    <FeedCard
+                      category={meta.label}
+                      Icon={meta.Icon}
+                      title={b.title}
+                      message={b.message}
+                      createdAt={b.createdAt}
+                      link={meta.link}
+                      onClick={() => setSelectedBroadcast(b)}
+                      onDelete={() => onDelete(b._id)}
+                    />
+                  </li>
+                );
+              })}
             </ul>
           )}
 
@@ -306,30 +292,23 @@ export default function BroadcastPage() {
             <div className={styles.empty}>No updates yet.</div>
           ) : (
             <ul className={styles.list}>
-              {updates.map((n) => (
-                <li key={n._id}>
-                  <button
-                    type="button"
-                    className={`${styles.updateItem} ${
-                      n.read ? "" : styles.updateUnread
-                    }`}
-                    onClick={() => onOpenUpdate(n)}
-                  >
-                    <div className={styles.updateTop}>
-                      <span className={styles.rowTitle}>{n.title}</span>
-                      <span className={styles.rowDate}>
-                        {n.createdAt ? timeLabel(n.createdAt, true) : ""}
-                      </span>
-                      {!n.read ? (
-                        <span className={styles.dot} aria-label="Unread" />
-                      ) : null}
-                    </div>
-                    {n.message ? (
-                      <p className={styles.updateMsg}>{n.message}</p>
-                    ) : null}
-                  </button>
-                </li>
-              ))}
+              {updates.map((n) => {
+                const meta = metaFromUpdate(n);
+                return (
+                  <li key={n._id}>
+                    <FeedCard
+                      category={meta.label}
+                      Icon={meta.Icon}
+                      title={n.title}
+                      message={n.message}
+                      createdAt={n.createdAt}
+                      link={meta.link}
+                      unread={meta.unread}
+                      onClick={() => onOpenUpdate(n)}
+                    />
+                  </li>
+                );
+              })}
             </ul>
           )}
 
