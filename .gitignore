@@ -1,0 +1,7 @@
+# node mdoules
+node_modules
+# env
+.env
+
+# next 
+.next

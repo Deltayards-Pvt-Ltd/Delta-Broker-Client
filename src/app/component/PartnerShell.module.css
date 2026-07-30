@@ -1,0 +1,90 @@
+.page {
+  position: relative;
+  isolation: isolate;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  color: #f3efe6;
+  background: transparent;
+}
+
+.wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: clamp(1.35rem, 3.5vw, 2.5rem) clamp(1.15rem, 3.5vw, 2rem) 3.5rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: clamp(1.75rem, 5vh, 2.75rem);
+}
+
+.brand {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  text-decoration: none;
+}
+
+.brandWordmark {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: clamp(1.05rem, 2.4vw, 1.2rem);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  line-height: 1.1;
+}
+
+.brandDelta {
+  color: #ffffff;
+}
+
+.brandYards {
+  color: #c5a059;
+}
+
+.brandTag {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #c5a059;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem 1.15rem;
+  font-size: 0.8125rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  padding-top: 0.15rem;
+}
+
+.nav a {
+  color: #9a958c;
+  transition: color 0.2s ease;
+}
+
+.nav a:hover {
+  color: #e6cf94;
+}
+
+.navActive {
+  color: #c5a059 !important;
+  font-weight: 650;
+}
+
+.content {
+  max-width: 440px;
+  margin: 0 auto;
+}
+
+.contentWide {
+  max-width: 920px;
+  margin: 0 auto;
+}
+

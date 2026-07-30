@@ -1,0 +1,178 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-gap);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.title {
+  font-size: clamp(1.5rem, 2.5vw, 1.875rem);
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.025em;
+}
+
+.copy {
+  margin-top: 0.35rem;
+  color: var(--ink-faint);
+  font-size: 0.9rem;
+  max-width: 36rem;
+  line-height: 1.6;
+}
+
+.refresh {
+  min-height: 40px;
+  padding: 0.55rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink-muted);
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.refresh:hover {
+  border-color: var(--line-hover);
+  color: var(--ink);
+}
+
+.error {
+  margin: 0;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+  color: var(--danger);
+  font-size: 0.875rem;
+}
+
+.muted {
+  color: var(--ink-faint);
+}
+
+.empty {
+  padding: 2.5rem 1.25rem;
+  text-align: center;
+  background: var(--surface);
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-lg);
+  color: var(--ink-faint);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.card {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: var(--card-pad);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.cardMain {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.meta {
+  font-size: 0.875rem;
+  color: var(--ink-faint);
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.ok,
+.no {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+}
+
+.ok {
+  background: var(--success-soft);
+  color: #4ade80;
+}
+
+.no {
+  background: var(--warning-soft);
+  color: #fbbf24;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.approve,
+.reject {
+  min-height: 40px;
+  padding: 0.55rem 1.1rem;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.approve {
+  background: transparent;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+}
+
+.approve:hover:not(:disabled) {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.reject {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border: 1px solid var(--danger-border);
+}
+
+.approve:disabled,
+.reject:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

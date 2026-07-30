@@ -1,0 +1,68 @@
+.row {
+  display: flex;
+  gap: 0.25rem;
+  margin-bottom: 1.75rem;
+  flex-wrap: wrap;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex: 1 1 auto;
+  min-width: 4.5rem;
+}
+
+.dot {
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  background: var(--surface);
+  color: var(--ink-muted);
+  border: 1px solid var(--line);
+  flex-shrink: 0;
+}
+
+.dotOn {
+  background: var(--primary);
+  color: var(--on-primary);
+  border-color: var(--primary);
+}
+
+.dotActive {
+  box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.22);
+}
+
+.label {
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(154, 146, 134, 0.55);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.labelActive {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.labelDone {
+  color: var(--ink-muted);
+}
+
+.line {
+  flex: 1;
+  height: 1px;
+  min-width: 0.5rem;
+  margin-left: 0.15rem;
+  background: var(--line);
+}
+
+.lineDone {
+  background: rgba(197, 160, 89, 0.45);
+}

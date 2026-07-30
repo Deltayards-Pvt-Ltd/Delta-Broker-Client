@@ -1,0 +1,168 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  width: 100%;
+}
+
+.meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+}
+
+.version {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #c2a366;
+  line-height: 1.35;
+  max-width: 70%;
+}
+
+.pctBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1.1;
+  flex-shrink: 0;
+}
+
+.pctNum {
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #e6cf94;
+}
+
+.pctLabel {
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #a89f8f;
+}
+
+.progressTrack {
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: inherit;
+  background: #c2a366;
+  transition: width 0.1s linear;
+}
+
+.hint,
+.hintDone {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.hint {
+  color: #d8cfc0;
+}
+
+.hintDone {
+  color: #5dde7a;
+  font-weight: 650;
+}
+
+.paperShell {
+  height: min(52vh, 480px);
+  min-height: 320px;
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid rgba(197, 160, 89, 0.28);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  background: #f4efe6;
+}
+
+.scroller {
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.paper {
+  color: #1a1712;
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.paperHead {
+  text-align: center;
+  margin-bottom: 1.35rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(26, 23, 18, 0.12);
+}
+
+.paperHead h2 {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-display), Georgia, serif;
+  font-size: clamp(1.25rem, 2.8vw, 1.55rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #14110c;
+}
+
+.paperHead p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #5a5348;
+}
+
+.section {
+  margin-top: 1.35rem;
+}
+
+.section h3 {
+  margin: 0 0 0.65rem;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #14110c;
+  line-height: 1.35;
+}
+
+.para {
+  margin: 0 0 0.8rem;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  color: #2a251e;
+}
+
+.endNote {
+  margin: 1.5rem 0 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(26, 23, 18, 0.12);
+  text-align: center;
+  font-size: 0.8rem;
+  color: #5a5348;
+  line-height: 1.5;
+}
+
+.endMarker {
+  height: 8px;
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .paperShell {
+    height: min(48vh, 420px);
+    min-height: 280px;
+  }
+
+  .para {
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+}
