@@ -4,7 +4,11 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { MapPin, ArrowRight, Search, Plus, Pencil, Trash2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
-import { deleteProject, fetchProjects } from "@/lib/projectApi";
+import {
+  deleteProject,
+  fetchProjects,
+  fetchProjectMeta,
+} from "@/lib/projectApi";
 import Pagination from "@/app/component/Pagination";
 import styles from "./projects.module.css";
 
@@ -37,6 +41,9 @@ export default function ProjectListPage({
   const [error, setError] = useState("");
   const [query, setQuery] = useState("");
   const [debouncedQ, setDebouncedQ] = useState("");
+  const [location, setLocation] = useState("");
+  const [locations, setLocations] = useState([]);
+  const [visibility, setVisibility] = useState("all");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [total, setTotal] = useState(0);
@@ -50,19 +57,32 @@ export default function ProjectListPage({
 
   useEffect(() => {
     setPage(1);
-  }, [debouncedQ, filter, limit, isBroker]);
+  }, [debouncedQ, location, visibility, filter, limit, isBroker]);
+
+  // Load location options for the filter dropdown (once)
+  useEffect(() => {
+    fetchProjectMeta()
+      .then((data) => setLocations(data.locations || []))
+      .catch(() => setLocations([]));
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
-      const apiFilter =
-        !isBroker && filter !== "all" ? filter : undefined;
+      // Fixed pages (/projects/active, /projects/closed) keep their filter.
+      // On the main page, admin can pick active/inactive from the dropdown.
+      let apiFilter;
+      if (!isBroker) {
+        if (filter !== "all") apiFilter = filter;
+        else if (visibility !== "all") apiFilter = visibility;
+      }
       const data = await fetchProjects({
         page,
         limit,
         filter: apiFilter,
         q: debouncedQ || undefined,
+        location: location || undefined,
       });
       setProjects(data.projects || []);
       setTotal(data.count ?? data.projects?.length ?? 0);
@@ -75,7 +95,7 @@ export default function ProjectListPage({
     } finally {
       setLoading(false);
     }
-  }, [page, limit, filter, debouncedQ, isBroker]);
+  }, [page, limit, filter, visibility, debouncedQ, location, isBroker]);
 
   useEffect(() => {
     load();
@@ -132,11 +152,36 @@ export default function ProjectListPage({
           <Search size={16} strokeWidth={1.75} />
           <input
             type="search"
-            placeholder="Search name, location, builder…"
+            placeholder="Search project name…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
         </label>
+
+        <select
+          className={styles.filterSelect}
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+        >
+          <option value="">All locations</option>
+          {locations.map((loc) => (
+            <option key={loc} value={loc}>
+              {loc}
+            </option>
+          ))}
+        </select>
+
+        {isAdmin && filter === "all" ? (
+          <select
+            className={styles.filterSelect}
+            value={visibility}
+            onChange={(e) => setVisibility(e.target.value)}
+          >
+            <option value="all">All projects</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        ) : null}
       </div>
 
       {error ? <p className={styles.error}>{error}</p> : null}

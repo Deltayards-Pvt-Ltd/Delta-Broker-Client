@@ -91,6 +91,20 @@
   font-size: 0.9375rem;
 }
 
+.filterSelect {
+  height: 44px;
+  min-width: 160px;
+  padding: 0 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 0.9375rem;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  outline: none;
+}
+
 .error {
   color: var(--danger);
   font-size: 0.9375rem;

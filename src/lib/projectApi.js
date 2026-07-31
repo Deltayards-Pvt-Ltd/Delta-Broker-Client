@@ -56,15 +56,24 @@ async function parse(res) {
   return data;
 }
 
-/** @param {{ page?: number, limit?: number, filter?: string, q?: string }} [opts] */
+/** @param {{ page?: number, limit?: number, filter?: string, q?: string, location?: string }} [opts] */
 export async function fetchProjects(opts = {}) {
   const params = new URLSearchParams();
   if (opts.page != null) params.set("page", String(opts.page));
   if (opts.limit != null) params.set("limit", String(opts.limit));
   if (opts.filter) params.set("filter", opts.filter);
   if (opts.q) params.set("q", opts.q);
+  if (opts.location) params.set("location", opts.location);
   const q = params.toString();
   const res = await fetch(`${API_URL}/api/projects${q ? `?${q}` : ""}`, {
+    headers: authHeaders(),
+  });
+  return parse(res);
+}
+
+/** GET /api/projects/meta — dropdown options + available locations */
+export async function fetchProjectMeta() {
+  const res = await fetch(`${API_URL}/api/projects/meta`, {
     headers: authHeaders(),
   });
   return parse(res);
