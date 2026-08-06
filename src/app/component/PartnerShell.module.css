@@ -7,6 +7,64 @@
   background: transparent;
 }
 
+/* App light theme — sky wash + ink chrome */
+.pageLight {
+  position: relative;
+  isolation: isolate;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  color: #1a1f2b;
+
+  --primary: #c5a059;
+  --primary-hover: #d4b06a;
+  --primary-soft: rgba(197, 160, 89, 0.16);
+  --primary-focus: rgba(197, 160, 89, 0.28);
+  --primary-deep: #c5a059;
+
+  --bg: #e8eef4;
+  --surface: #ffffff;
+  --surface-muted: #f7f8fa;
+  --sidebar-bg: #e8eef4;
+
+  --ink: #1a1f2b;
+  --ink-body: #1a1f2b;
+  --ink-muted: #8b909a;
+  --ink-faint: #8b909a;
+  --on-primary: #ffffff;
+
+  --line: #e2e5ea;
+  --line-hover: #c8cdd5;
+  --line-strong: #1a1f2b;
+
+  --danger: #d35b5b;
+  --danger-bg: rgba(211, 91, 91, 0.1);
+  --danger-border: rgba(211, 91, 91, 0.28);
+  --success: #059669;
+  --success-soft: rgba(5, 150, 105, 0.12);
+
+  background: linear-gradient(180deg, #b7d0e8 0%, #d8e4ef 45%, #e8eef4 100%);
+}
+
+.pageLight::before {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  width: min(80vw, 520px);
+  height: min(80vw, 520px);
+  top: -8%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.55) 0%,
+    rgba(183, 208, 232, 0.2) 45%,
+    transparent 70%
+  );
+  filter: blur(28px);
+}
+
 .wrap {
   position: relative;
   z-index: 1;
@@ -23,11 +81,28 @@
   margin-bottom: clamp(1.75rem, 5vh, 2.75rem);
 }
 
+.headerNavOnly {
+  justify-content: flex-end;
+  margin-bottom: clamp(0.85rem, 2vh, 1.35rem);
+}
+
 .brand {
   display: inline-flex;
   flex-direction: column;
   gap: 0.35rem;
   text-decoration: none;
+}
+
+.pageLight .brand {
+  flex-direction: row;
+  align-items: center;
+}
+
+.brandMark {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  border-radius: 12px;
 }
 
 .brandWordmark {
@@ -40,6 +115,10 @@
 
 .brandDelta {
   color: #ffffff;
+}
+
+.pageLight .brandDelta {
+  color: #1a1f2b;
 }
 
 .brandYards {
@@ -69,8 +148,16 @@
   transition: color 0.2s ease;
 }
 
+.pageLight .nav a {
+  color: #8b909a;
+}
+
 .nav a:hover {
   color: #e6cf94;
+}
+
+.pageLight .nav a:hover {
+  color: #1a1f2b;
 }
 
 .navActive {
@@ -84,7 +171,6 @@
 }
 
 .contentWide {
-  max-width: 920px;
+  max-width: 820px;
   margin: 0 auto;
 }
-

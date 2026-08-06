@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { MapPin, ArrowRight, Search, Plus, Pencil, Trash2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { isBrokerRole, isSuperAdminRole } from "@/lib/roles";
 import {
   deleteProject,
   fetchProjects,
@@ -34,8 +35,8 @@ export default function ProjectListPage({
   emptyText = "No projects found.",
 }) {
   const { user } = useAuth();
-  const isBroker = user?.role === "broker";
-  const isAdmin = user?.role === "admin";
+  const isBroker = isBrokerRole(user?.role);
+  const isAdmin = isSuperAdminRole(user?.role);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");

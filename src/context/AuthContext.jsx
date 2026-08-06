@@ -8,8 +8,20 @@ import {
   getUser,
   setSession,
 } from "@/lib/auth";
+import { loginPassword as loginPasswordApi } from "@/lib/loginApi";
 
 const AuthContext = createContext(null);
+
+function normalizeSessionUser(data) {
+  const user = data?.user || {};
+  return {
+    ...user,
+    id: user.id || user._id,
+    passwordResetBySuperAdmin: Boolean(
+      data?.passwordResetBySuperAdmin ?? user.passwordResetBySuperAdmin
+    ),
+  };
+}
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -23,10 +35,21 @@ export function AuthProvider({ children }) {
   }, []);
 
   const applySession = (data) => {
-    setSession(data.token, data.user);
+    const nextUser = normalizeSessionUser(data);
+    setSession(data.token, nextUser);
     setToken(data.token);
-    setUser(data.user);
-    return data;
+    setUser(nextUser);
+    return { ...data, user: nextUser };
+  };
+
+  const updateUser = (patch) => {
+    setUser((prev) => {
+      if (!prev) return prev;
+      const next = { ...prev, ...patch };
+      const t = getToken();
+      if (t) setSession(t, next);
+      return next;
+    });
   };
 
   const loginWithOtp = async (phone, otp) => {
@@ -41,21 +64,25 @@ export function AuthProvider({ children }) {
     return applySession(data);
   };
 
-  const loginAdmin = async (password) => {
-    const res = await fetch(`${API_URL}/api/auth/login/admin`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ password }),
-    });
-
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || "Login failed");
+  const loginWithPassword = async (phone, password) => {
+    const data = await loginPasswordApi(phone, password);
     return applySession(data);
+  };
+
+  /** @deprecated use loginWithPassword */
+  const loginAdmin = async (password) => {
+    throw new Error(
+      "Admin login now requires phone + password. Use the main Sign in page."
+    );
   };
 
   const logout = async () => {
     try {
-      await fetch(`${API_URL}/api/auth/logout`, { method: "POST" });
+      const t = getToken();
+      await fetch(`${API_URL}/api/auth/logout`, {
+        method: "POST",
+        headers: t ? { Authorization: `Bearer ${t}` } : {},
+      });
     } catch {
       // client-side clear is enough for JWT
     }
@@ -72,7 +99,9 @@ export function AuthProvider({ children }) {
         loading,
         isAuthenticated: Boolean(token),
         loginWithOtp,
+        loginWithPassword,
         loginAdmin,
+        updateUser,
         logout,
       }}
     >

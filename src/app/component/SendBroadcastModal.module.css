@@ -19,7 +19,7 @@
   position: relative;
   z-index: 1;
   width: min(560px, 100%);
-  max-height: min(90vh, 760px);
+  max-height: min(92vh, 860px);
   display: flex;
   flex-direction: column;
   background: var(--surface);
@@ -206,4 +206,62 @@
 .cancel:disabled {
   opacity: 0.55;
   cursor: not-allowed;
+}
+
+.audience {
+  margin: 0;
+  padding: 0;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.audiencePanel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--ink-muted);
+}
+
+.checkList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.checkRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+
+.checkRow input {
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+}
+
+.meta {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--ink-muted);
 }

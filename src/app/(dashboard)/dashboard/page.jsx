@@ -3,18 +3,22 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
-  BadgeCheck,
-  Building2,
   FolderKanban,
   UserCheck,
-  UserX,
-  Users,
   Clock,
   ArrowUpRight,
+  Moon,
+  Sun,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "@/context/ThemeContext";
+import { isStaffRole, isSuperAdminRole } from "@/lib/roles";
 import MembershipCard from "@/app/component/MembershipCard";
 import { fetchDashboardSummary } from "@/lib/dashboardApi";
+import {
+  publishPendingFromSummary,
+  useStaffPendingCount,
+} from "@/lib/usePendingCount";
 import styles from "./page.module.css";
 
 function greeting() {
@@ -55,19 +59,17 @@ function StatCard({ href = null, icon: Icon, label, value, hint, tone, card }) {
 
 export default function HomePage() {
   const { user } = useAuth();
-  const isAdmin = user?.role === "admin";
-  const firstName =
-    user?.name?.split(" ")[0] || (isAdmin ? "Admin" : "there");
+  const { isLight, toggleTheme } = useTheme();
+  const isAdmin = isStaffRole(user?.role);
+  const isSuper = isSuperAdminRole(user?.role);
+  const pendingBadge = useStaffPendingCount(user, { fetchOnMount: false });
+  const firstName = user?.name || (isAdmin ? "Admin" : "there");
 
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState({
     pending: 0,
     approved: 0,
-    rejected: 0,
-    totalBrokers: 0,
     projects: 0,
-    activeProjects: 0,
-    inactiveProjects: 0,
   });
   const [recentProjects, setRecentProjects] = useState([]);
 
@@ -88,13 +90,10 @@ export default function HomePage() {
         setStats({
           pending: b.pending ?? 0,
           approved: b.approved ?? 0,
-          rejected: b.rejected ?? 0,
-          totalBrokers: b.total ?? 0,
           projects: p.total ?? 0,
-          activeProjects: p.active ?? 0,
-          inactiveProjects: p.inactive ?? 0,
         });
         setRecentProjects(data.recentProjects || []);
+        publishPendingFromSummary(data);
       } catch {
         /* keep zeros */
       } finally {
@@ -110,103 +109,109 @@ export default function HomePage() {
 
   return (
     <div className={styles.page}>
-      <header className={styles.header}>
-        <div>
-          <p className={styles.eyebrow}>
-            {isAdmin ? "Admin dashboard" : "Channel partner"}
-          </p>
-          <h1 className={styles.title}>
-            {greeting()}, {firstName}
-          </h1>
-          <p className={styles.copy}>
-            {isAdmin
-              ? "Channel partner network overview for Delta Yards."
-              : "Membership minted — browse projects from here."}
-          </p>
+      <div
+        className={`${styles.welcome} ${
+          isLight ? styles.welcomeLight : styles.welcomeDark
+        }`}
+      >
+        <div className={styles.atmosphere} aria-hidden>
+          <div className={styles.atmDay}>
+            <span className={styles.sunHalo} />
+            <span className={styles.sunGlow} />
+            <span className={styles.sunCore} />
+            <span className={`${styles.cloud} ${styles.cloudA}`} />
+            <span className={`${styles.cloud} ${styles.cloudB}`} />
+            <span className={`${styles.cloudSoft} ${styles.cloudC}`} />
+            <span className={`${styles.bird} ${styles.birdA}`} />
+            <span className={`${styles.bird} ${styles.birdB}`} />
+            <span className={`${styles.bird} ${styles.birdC}`} />
+          </div>
+          <div className={styles.atmNight}>
+            <span className={`${styles.nightCloud} ${styles.nightCloudA}`} />
+            <span className={`${styles.nightCloudSoft} ${styles.nightCloudB}`} />
+            <span className={`${styles.star} ${styles.starA}`} />
+            <span className={`${styles.star} ${styles.starB}`} />
+            <span className={`${styles.star} ${styles.starC}`} />
+            <span className={`${styles.starTiny} ${styles.starD}`} />
+            <span className={`${styles.starTiny} ${styles.starE}`} />
+          </div>
         </div>
-      </header>
+        <span className={styles.welcomeAccent} aria-hidden />
+        <header className={styles.header}>
+          <p className={styles.eyebrow}>
+            {greeting()}{" "}
+            <span className={styles.wave} aria-hidden>
+              👋
+            </span>
+          </p>
+          <h1 className={styles.title}>{firstName}</h1>
+        </header>
+        <button
+          type="button"
+          className={`${styles.themeBtn} ${
+            isLight ? styles.themeBtnLight : styles.themeBtnDark
+          }`}
+          onClick={toggleTheme}
+          aria-label={isLight ? "Switch to dark mode" : "Switch to light mode"}
+          title={isLight ? "Dark mode" : "Light mode"}
+        >
+          <span className={styles.themeClip}>
+            <span className={`${styles.themeIcon} ${styles.moonIcon}`} aria-hidden>
+              <Moon size={20} strokeWidth={1.75} />
+            </span>
+            <span className={`${styles.themeIcon} ${styles.sunIcon}`} aria-hidden>
+              <span className={styles.sunBtnGlow} />
+              <Sun size={20} strokeWidth={1.75} />
+            </span>
+          </span>
+        </button>
+      </div>
 
       {isAdmin ? (
-        <div className={styles.stats}>
-          <StatCard
-            href="/approvals"
-            icon={Clock}
-            label="Pending approvals"
-            value={n(stats.pending)}
-            hint="Awaiting review"
-            tone="toneWarn"
-            card="cardAmber"
-          />
-          <StatCard
-            href="/brokers/approved"
-            icon={UserCheck}
-            label="Approved brokers"
-            value={n(stats.approved)}
-            hint="Can sign in"
-            tone="toneOk"
-            card="cardEmerald"
-          />
-          <StatCard
-            href="/brokers/rejected"
-            icon={UserX}
-            label="Rejected"
-            value={n(stats.rejected)}
-            hint="Not approved"
-            tone="toneDanger"
-            card="cardRed"
-          />
-          <StatCard
-            href="/brokers"
-            icon={Users}
-            label="Total brokers"
-            value={n(stats.totalBrokers)}
-            hint="All statuses"
-            tone="toneInfo"
-            card="cardBlue"
-          />
-          <StatCard
-            href="/projects"
-            icon={FolderKanban}
-            label="All projects"
-            value={n(stats.projects)}
-            hint="Inventory"
-            tone="tonePrimary"
-            card="cardTeal"
-          />
-          <StatCard
-            href="/projects/active"
-            icon={BadgeCheck}
-            label="Active projects"
-            value={n(stats.activeProjects)}
-            hint="Visible to brokers"
-            tone="toneOk"
-            card="cardEmerald"
-          />
-          <StatCard
-            href="/projects/closed"
-            icon={Building2}
-            label="Inactive projects"
-            value={n(stats.inactiveProjects)}
-            hint="Hidden from brokers"
-            tone="toneMuted"
-            card="cardSlate"
-          />
-        </div>
-      ) : (
         <>
-          <MembershipCard
-            membershipId={user?.membershipId}
-            name={user?.name}
-            partnerType={user?.partnerType}
-            firmName={user?.firmName}
-            validFrom={user?.membershipValidFrom}
-            validTill={user?.membershipValidTill}
-            phone={user?.phone}
-            maharera={user?.maharera}
-            status={user?.status}
-          />
-
+          <p className={styles.sectionLabel}>Overview</p>
+          <div className={styles.stats}>
+            <StatCard
+              href="/projects"
+              icon={FolderKanban}
+              label="Projects"
+              value={n(stats.projects)}
+              hint="All projects"
+              tone="toneWarn"
+              card="cardAmber"
+            />
+            <StatCard
+              href="/brokers/approved"
+              icon={UserCheck}
+              label="Brokers"
+              value={n(stats.approved)}
+              hint="Approved"
+              tone="toneInfo"
+              card="cardBlue"
+            />
+            <StatCard
+              href={isSuper ? "/approvals" : "/brokers/pending"}
+              icon={Clock}
+              label="Pending"
+              value={n(stats.pending)}
+              hint="To review"
+              tone="toneOk"
+              card="cardTeal"
+            />
+          </div>
         </>
+      ) : (
+        <MembershipCard
+          membershipId={user?.membershipId}
+          name={user?.name}
+          partnerType={user?.partnerType}
+          firmName={user?.firmName}
+          validFrom={user?.membershipValidFrom}
+          validTill={user?.membershipValidTill}
+          phone={user?.phone}
+          maharera={user?.maharera}
+          status={user?.status}
+        />
       )}
 
       <section className={styles.panel}>
@@ -216,9 +221,25 @@ export default function HomePage() {
         <div className={styles.quickGrid}>
           {isAdmin ? (
             <>
-              <Link href="/approvals" className={styles.quickCard}>
-                <strong>Approvals</strong>
-                <span>Approve or reject registrations</span>
+              <Link
+                href={isSuper ? "/approvals" : "/brokers/pending"}
+                className={`${styles.quickCard} ${
+                  pendingBadge > 0 ? styles.quickCardAlert : ""
+                }`}
+              >
+                <span className={styles.quickTop}>
+                  <strong>Approvals</strong>
+                  {pendingBadge > 0 ? (
+                    <span className={styles.quickBadge}>
+                      {pendingBadge > 99 ? "99+" : pendingBadge}
+                    </span>
+                  ) : null}
+                </span>
+                <span>
+                  {pendingBadge > 0
+                    ? `${pendingBadge} pending review`
+                    : "Approve or reject registrations"}
+                </span>
               </Link>
               <Link href="/brokers" className={styles.quickCard}>
                 <strong>All brokers</strong>

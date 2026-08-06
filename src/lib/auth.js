@@ -1,3 +1,5 @@
+import { isStaffRole } from "@/lib/roles";
+
 const TOKEN_KEY = "delta_broker_token";
 const USER_KEY = "delta_broker_user";
 
@@ -35,7 +37,12 @@ export function isAuthenticated() {
 /** Where to send the user after auth based on role/status */
 export function getPostLoginPath(user) {
   if (!user) return "/login";
-  if (user.role === "admin") return "/dashboard";
+
+  if (isStaffRole(user.role)) {
+    if (user.passwordResetBySuperAdmin) return "/password-reset";
+    return "/dashboard";
+  }
+
   if (user.status === "pending") return "/pending";
   if (user.status === "approved" || user.status === "active") return "/dashboard";
   return "/pending";

@@ -7,6 +7,12 @@ export const BROADCAST_KINDS = [
   { key: "policy", label: "Policy" },
 ];
 
+export const BROADCAST_AUDIENCES = [
+  { key: "all", label: "All brokers" },
+  { key: "categories", label: "Category" },
+  { key: "brokers", label: "Selected brokers" },
+];
+
 function authHeaders() {
   const token = getToken();
   return {

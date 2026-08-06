@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCheck, Megaphone, Plus } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { isSuperAdminRole } from "@/lib/roles";
 import { deleteBroadcast, fetchBroadcasts } from "@/lib/broadcastApi";
 import {
   fetchNotifications,
@@ -23,6 +25,8 @@ const PAGE_SIZE = 10;
 
 export default function BroadcastPage() {
   const router = useRouter();
+  const { user } = useAuth();
+  const canCompose = isSuperAdminRole(user?.role);
   const [mode, setMode] = useState("broadcast"); // broadcast | updates
 
   // ── Broadcast (outbox) ──
@@ -165,7 +169,7 @@ export default function BroadcastPage() {
             Send partner updates, or review approval notices
           </p>
         </div>
-        {mode === "broadcast" ? (
+        {mode === "broadcast" && canCompose ? (
           <button
             type="button"
             className={styles.sendBtn}
@@ -178,7 +182,7 @@ export default function BroadcastPage() {
             <Plus size={18} strokeWidth={2.5} />
             New broadcast
           </button>
-        ) : (
+        ) : mode === "updates" ? (
           <button
             type="button"
             className={styles.ghostBtn}
@@ -188,7 +192,7 @@ export default function BroadcastPage() {
             <CheckCheck size={16} strokeWidth={2} />
             Mark all read
           </button>
-        )}
+        ) : null}
       </header>
 
       <div className={styles.segment} role="tablist" aria-label="Broadcast sections">
@@ -251,11 +255,11 @@ export default function BroadcastPage() {
                       category={meta.label}
                       Icon={meta.Icon}
                       title={b.title}
-                      message={b.message}
+                      message={`${b.audienceLabel || "All brokers"} · ${b.recipientCount ?? 0} recipients — ${b.message}`}
                       createdAt={b.createdAt}
                       link={meta.link}
                       onClick={() => setSelectedBroadcast(b)}
-                      onDelete={() => onDelete(b._id)}
+                      onDelete={canCompose ? () => onDelete(b._id) : undefined}
                     />
                   </li>
                 );
@@ -329,11 +333,13 @@ export default function BroadcastPage() {
         </section>
       )}
 
-      <SendBroadcastModal
-        open={composerOpen}
-        onClose={() => setComposerOpen(false)}
-        onSent={onSent}
-      />
+      {canCompose ? (
+        <SendBroadcastModal
+          open={composerOpen}
+          onClose={() => setComposerOpen(false)}
+          onSent={onSent}
+        />
+      ) : null}
 
       <UpdateDetailModal
         open={Boolean(selectedBroadcast)}

@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { isStaffRole } from "@/lib/roles";
 
 /** Old path → role-based updates surface */
 export default function NotificationsRedirect() {
@@ -11,7 +12,7 @@ export default function NotificationsRedirect() {
 
   useEffect(() => {
     if (loading) return;
-    if (user?.role === "admin") {
+    if (isStaffRole(user?.role)) {
       router.replace("/broadcast");
     } else {
       router.replace("/updates");

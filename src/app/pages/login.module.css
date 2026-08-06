@@ -8,6 +8,11 @@
   font-size: 0.75rem;
 }
 
+.appTheme.loading,
+.appTheme .loading {
+  color: #8b909a;
+}
+
 .intro {
   margin-bottom: 1.25rem;
 }
@@ -31,6 +36,10 @@
   color: #f7f2e8;
 }
 
+.subheading {
+  margin: 0;
+}
+
 .copy {
   margin: 0;
   color: #b3ad9f;
@@ -45,4 +54,66 @@
   border: 1px solid rgba(245, 241, 234, 0.08);
   box-shadow: 0 24px 50px rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(8px);
+}
+
+.brandHero {
+  display: none;
+}
+
+/* —— App light theme (login) —— */
+.appTheme .brandHero {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1.25rem;
+  padding-top: 0.25rem;
+}
+
+.appTheme .brandHeroImg {
+  width: min(280px, 72vw);
+  height: auto;
+  object-fit: contain;
+}
+
+.appTheme .intro {
+  margin-bottom: 1.35rem;
+}
+
+.appTheme .title {
+  margin: 0 0 0.2rem;
+  font-size: clamp(1.55rem, 4vw, 1.7rem);
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  color: #1a1f2b;
+}
+
+.appTheme .subheading {
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #1a1f2b;
+}
+
+.appTheme .copy {
+  color: #8b909a;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.appTheme .panel {
+  padding: clamp(1.5rem, 3.5vw, 1.85rem) clamp(1.35rem, 3vw, 1.65rem)
+    clamp(1.25rem, 3vw, 1.5rem);
+  border-radius: 36px 36px 28px 28px;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.72) 0%,
+      rgba(255, 255, 255, 0.42) 48%,
+      rgba(255, 255, 255, 0.28) 100%
+    ),
+    rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 14px 28px rgba(26, 31, 43, 0.12);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 }

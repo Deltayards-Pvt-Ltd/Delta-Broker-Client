@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { updateBroker } from "@/lib/brokerApi";
+import { fetchCategories } from "@/lib/categoryApi";
 import styles from "./BrokerEditModal.module.css";
 
 const EMPTY = {
@@ -12,10 +13,18 @@ const EMPTY = {
   maharera: "",
   partnerType: "individual",
   firmName: "",
+  categoryIds: [],
 };
+
+function categoryIdsFromBroker(broker) {
+  return (broker?.categories || [])
+    .map((c) => (typeof c === "object" && c !== null ? String(c._id) : String(c)))
+    .filter(Boolean);
+}
 
 export default function BrokerEditModal({ broker, open, onClose, onSaved }) {
   const [form, setForm] = useState(EMPTY);
+  const [categories, setCategories] = useState([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
@@ -29,7 +38,12 @@ export default function BrokerEditModal({ broker, open, onClose, onSaved }) {
       maharera: broker.maharera || "",
       partnerType: broker.partnerType === "company" ? "company" : "individual",
       firmName: broker.firmName || "",
+      categoryIds: categoryIdsFromBroker(broker),
     });
+
+    fetchCategories()
+      .then((data) => setCategories(data.categories || []))
+      .catch(() => setCategories([]));
   }, [open, broker]);
 
   useEffect(() => {
@@ -45,6 +59,18 @@ export default function BrokerEditModal({ broker, open, onClose, onSaved }) {
 
   const setField = (key, value) => {
     setForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const toggleCategory = (id) => {
+    setForm((prev) => {
+      const has = prev.categoryIds.includes(id);
+      return {
+        ...prev,
+        categoryIds: has
+          ? prev.categoryIds.filter((x) => x !== id)
+          : [...prev.categoryIds, id],
+      };
+    });
   };
 
   const isCompany = form.partnerType === "company";
@@ -71,6 +97,7 @@ export default function BrokerEditModal({ broker, open, onClose, onSaved }) {
         maharera: form.maharera.trim(),
         partnerType: form.partnerType,
         firmName: isCompany ? form.firmName.trim() : "",
+        categories: form.categoryIds,
       });
       onSaved?.(data.broker);
       onClose?.();
@@ -178,6 +205,38 @@ export default function BrokerEditModal({ broker, open, onClose, onSaved }) {
               disabled={saving}
             />
           </label>
+
+          <fieldset className={styles.categories}>
+            <legend>
+              <span>Categories</span>
+            </legend>
+            {categories.length === 0 ? (
+              <p className={styles.hint}>
+                No categories yet. Create them under Brokers → Categories.
+              </p>
+            ) : (
+              <div className={styles.chips} role="group" aria-label="Categories">
+                {categories.map((cat) => {
+                  const id = String(cat._id);
+                  const active = form.categoryIds.includes(id);
+                  return (
+                    <button
+                      key={id}
+                      type="button"
+                      className={`${styles.chip} ${
+                        active ? styles.chipActive : ""
+                      }`}
+                      onClick={() => toggleCategory(id)}
+                      disabled={saving}
+                      aria-pressed={active}
+                    >
+                      {cat.name}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </fieldset>
 
           {error ? (
             <p className={styles.error} role="alert">

@@ -48,7 +48,6 @@ export default function LandingPage() {
               Sign in
             </Link>
             <Link href="/register">Register</Link>
-            <Link href="/admin/login">Admin</Link>
           </nav>
         </header>
 

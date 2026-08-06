@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { Pencil, Search } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { isSuperAdminRole } from "@/lib/roles";
 import { fetchBrokers } from "@/lib/brokerApi";
 import Pagination from "@/app/component/Pagination";
 import BrokerEditModal from "@/app/component/BrokerEditModal";
@@ -34,6 +36,8 @@ export default function BrokerListPage({
   eyebrow = "Brokers",
   emptyText = "No brokers found.",
 }) {
+  const { user } = useAuth();
+  const canEdit = isSuperAdminRole(user?.role);
   const [brokers, setBrokers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -151,7 +155,7 @@ export default function BrokerListPage({
                   <th>Member since</th>
                   <th>Valid till</th>
                   <th>Status</th>
-                  <th>Actions</th>
+                  {canEdit ? <th>Actions</th> : null}
                 </tr>
               </thead>
               <tbody>
@@ -187,17 +191,19 @@ export default function BrokerListPage({
                           {b.status}
                         </span>
                       </td>
-                      <td>
-                        <button
-                          type="button"
-                          className={styles.editBtn}
-                          onClick={() => setEditing(b)}
-                          aria-label={`Edit ${b.name || "broker"}`}
-                        >
-                          <Pencil size={14} strokeWidth={1.75} />
-                          Edit
-                        </button>
-                      </td>
+                      {canEdit ? (
+                        <td>
+                          <button
+                            type="button"
+                            className={styles.editBtn}
+                            onClick={() => setEditing(b)}
+                            aria-label={`Edit ${b.name || "broker"}`}
+                          >
+                            <Pencil size={14} strokeWidth={1.75} />
+                            Edit
+                          </button>
+                        </td>
+                      ) : null}
                     </tr>
                   );
                 })}
@@ -217,12 +223,14 @@ export default function BrokerListPage({
         </>
       ) : null}
 
-      <BrokerEditModal
-        broker={editing}
-        open={Boolean(editing)}
-        onClose={() => setEditing(null)}
-        onSaved={onSaved}
-      />
+      {canEdit ? (
+        <BrokerEditModal
+          broker={editing}
+          open={Boolean(editing)}
+          onClose={() => setEditing(null)}
+          onSaved={onSaved}
+        />
+      ) : null}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import AuthForm from "@/app/component/authForm";
 import PartnerShell from "@/app/component/PartnerShell";
@@ -27,24 +28,37 @@ export default function LoginPage() {
 
   if (loading || isAuthenticated) {
     return (
-      <PartnerShell activeNav="login">
-        <div className={styles.loading}>Loading…</div>
+      <PartnerShell activeNav="login" variant="light" hideBrand>
+        <div className={`${styles.appTheme} ${styles.loading}`}>Loading…</div>
       </PartnerShell>
     );
   }
 
   return (
-    <PartnerShell activeNav="login">
-      <div className={styles.intro}>
-        <p className={styles.eyebrow}>DCP · Partner access</p>
-        <h1 className={styles.title}>Sign in to your partnership.</h1>
-        <p className={styles.copy}>
-          Use the mobile number you registered with. We&apos;ll send a one-time
-          code.
-        </p>
-      </div>
-      <div className={styles.panel}>
-        <AuthForm />
+    <PartnerShell activeNav="login" variant="light" hideBrand>
+      <div className={styles.appTheme}>
+        <div className={styles.brandHero}>
+          <Image
+            src="/loo_with_text.png"
+            alt="Delta Yards Channel Partner"
+            width={280}
+            height={168}
+            className={styles.brandHeroImg}
+            priority
+          />
+        </div>
+
+        <div className={styles.panel}>
+          <div className={styles.intro}>
+            <h1 className={styles.title}>Welcome back!</h1>
+            <p className={styles.subheading}>Sign in to your partnership</p>
+            <p className={styles.copy}>
+              Enter your registered mobile. Partners get an OTP; admins enter a
+              password.
+            </p>
+          </div>
+          <AuthForm theme="app" />
+        </div>
       </div>
     </PartnerShell>
   );

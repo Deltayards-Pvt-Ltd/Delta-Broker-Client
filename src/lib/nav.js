@@ -1,7 +1,11 @@
-export const ROLES = {
-  ADMIN: "admin",
-  BROKER: "broker",
-};
+import {
+  ROLES,
+  STAFF_ROLES,
+  isStaffRole,
+  isSuperAdminRole,
+} from "@/lib/roles";
+
+export { ROLES, STAFF_ROLES, isStaffRole, isSuperAdminRole };
 
 /** Nav items with role access. Omit `roles` = all authenticated users. */
 export const NAV_ITEMS = [
@@ -16,14 +20,14 @@ export const NAV_ITEMS = [
     label: "Approvals",
     href: "/approvals",
     icon: "check",
-    roles: [ROLES.ADMIN],
+    roles: [ROLES.SUPER_ADMIN],
   },
   {
     id: "broadcast",
     label: "Broadcast",
     href: "/broadcast",
     icon: "bell",
-    roles: [ROLES.ADMIN],
+    roles: STAFF_ROLES,
   },
   {
     id: "updates",
@@ -36,13 +40,26 @@ export const NAV_ITEMS = [
     id: "brokers",
     label: "Brokers",
     icon: "users",
-    roles: [ROLES.ADMIN],
+    roles: STAFF_ROLES,
     children: [
       { id: "brokers-all", label: "All Brokers", href: "/brokers" },
       { id: "brokers-approved", label: "Approved", href: "/brokers/approved" },
       { id: "brokers-pending", label: "Pending", href: "/brokers/pending" },
       { id: "brokers-rejected", label: "Rejected", href: "/brokers/rejected" },
+      {
+        id: "brokers-categories",
+        label: "Categories",
+        href: "/brokers/categories",
+        roles: [ROLES.SUPER_ADMIN],
+      },
     ],
+  },
+  {
+    id: "admins",
+    label: "Admins",
+    href: "/admins",
+    icon: "users",
+    roles: [ROLES.SUPER_ADMIN],
   },
   {
     id: "projects",
@@ -54,25 +71,25 @@ export const NAV_ITEMS = [
         id: "projects-all",
         label: "All Projects",
         href: "/projects",
-        roles: [ROLES.ADMIN],
+        roles: STAFF_ROLES,
       },
       {
         id: "projects-active",
         label: "Active",
         href: "/projects/active",
-        roles: [ROLES.ADMIN],
+        roles: STAFF_ROLES,
       },
       {
         id: "projects-closed",
         label: "Closed",
         href: "/projects/closed",
-        roles: [ROLES.ADMIN],
+        roles: STAFF_ROLES,
       },
       {
         id: "projects-new",
         label: "Add Project",
         href: "/projects/new",
-        roles: [ROLES.ADMIN],
+        roles: [ROLES.SUPER_ADMIN],
       },
     ],
   },
@@ -94,13 +111,13 @@ export const TOP_TABS = [
     id: "approvals",
     label: "Approvals",
     href: "/approvals",
-    roles: [ROLES.ADMIN],
+    roles: [ROLES.SUPER_ADMIN],
   },
   {
     id: "broadcast",
     label: "Broadcast",
     href: "/broadcast",
-    roles: [ROLES.ADMIN],
+    roles: STAFF_ROLES,
   },
   {
     id: "updates",
@@ -112,7 +129,13 @@ export const TOP_TABS = [
     id: "brokers",
     label: "Brokers",
     href: "/brokers",
-    roles: [ROLES.ADMIN],
+    roles: STAFF_ROLES,
+  },
+  {
+    id: "admins",
+    label: "Admins",
+    href: "/admins",
+    roles: [ROLES.SUPER_ADMIN],
   },
   { id: "projects", label: "Projects", href: "/projects" },
 ];
@@ -137,10 +160,45 @@ export function navForRole(items, role) {
     });
 }
 
-/** Paths brokers may open */
+/** Path access by role */
 export function canAccessPath(pathname, role) {
-  if (role === ROLES.ADMIN) return true;
+  if (isSuperAdminRole(role)) return true;
 
+  // Plain admin — read-heavy ops; no approvals / admins / project writes
+  if (role === ROLES.ADMIN) {
+    if (pathname === "/approvals" || pathname.startsWith("/approvals/")) {
+      return false;
+    }
+    if (pathname === "/admins" || pathname.startsWith("/admins/")) {
+      return false;
+    }
+    if (
+      pathname === "/projects/new" ||
+      pathname.endsWith("/edit")
+    ) {
+      return false;
+    }
+    if (
+      pathname === "/dashboard" ||
+      pathname === "/profile" ||
+      pathname === "/profile/password" ||
+      pathname === "/password-reset" ||
+      pathname === "/password-reset/change" ||
+      pathname === "/broadcast" ||
+      pathname.startsWith("/brokers") ||
+      pathname === "/projects" ||
+      pathname === "/projects/active" ||
+      pathname === "/projects/closed" ||
+      pathname.startsWith("/projects/")
+    ) {
+      // Categories manage is super_admin only
+      if (pathname.startsWith("/brokers/categories")) return false;
+      return true;
+    }
+    return false;
+  }
+
+  // Broker
   if (pathname === "/dashboard") return true;
   if (pathname === "/profile") return true;
   if (pathname === "/updates") return true;

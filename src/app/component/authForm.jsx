@@ -5,7 +5,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { getPostLoginPath } from "@/lib/auth";
-import { isValidPhone, loginCheckPhone, loginSendOtp } from "@/lib/loginApi";
+import {
+  isValidAdminPin,
+  isValidPhone,
+  loginCheckPhone,
+  loginSendOtp,
+} from "@/lib/loginApi";
 import styles from "./authForm.module.css";
 
 const OTP_MS = 2 * 60 * 1000;
@@ -17,19 +22,27 @@ function formatTimer(ms) {
   return `${m}:${String(r).padStart(2, "0")}`;
 }
 
-export default function AuthForm() {
+export default function AuthForm({ theme = "default" }) {
   const router = useRouter();
-  const { loginWithOtp } = useAuth();
+  const { loginWithOtp, loginWithPassword } = useAuth();
+  const isApp = theme === "app";
 
   const [phone, setPhone] = useState("");
   const [phoneStatus, setPhoneStatus] = useState(null);
   const [checking, setChecking] = useState(false);
+
+  // broker OTP
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
   const [demoOtp, setDemoOtp] = useState(null);
   const [otpUntil, setOtpUntil] = useState(0);
   const [now, setNow] = useState(Date.now());
   const [sending, setSending] = useState(false);
+
+  // admin password
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -39,19 +52,20 @@ export default function AuthForm() {
     return () => clearInterval(id);
   }, [otpUntil]);
 
-  const resetFlow = () => {
+  const resetDownstream = () => {
     setPhoneStatus(null);
     setOtpSent(false);
     setOtp("");
     setDemoOtp(null);
     setOtpUntil(0);
+    setPassword("");
     setError("");
   };
 
   const handlePhoneChange = (value) => {
     const digits = value.replace(/\D/g, "").slice(0, 10);
     setPhone(digits);
-    resetFlow();
+    resetDownstream();
   };
 
   const handleCheckPhone = async () => {
@@ -106,12 +120,52 @@ export default function AuthForm() {
     }
   };
 
-  const canSendOtp = phoneStatus?.canLogin === true;
+  const handleAdminLogin = async (e) => {
+    e.preventDefault();
+    setError("");
+    if (!isValidAdminPin(password)) {
+      setError("Password must be exactly 4 digits");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const data = await loginWithPassword(phone, password);
+      router.replace(getPostLoginPath(data.user));
+    } catch (err) {
+      setError(err.message || "Login failed");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const isAdminPath =
+    phoneStatus?.canLogin &&
+    phoneStatus?.type === "admin" &&
+    phoneStatus?.next === "password";
+  const isBrokerPath =
+    phoneStatus?.canLogin &&
+    phoneStatus?.type === "broker" &&
+    phoneStatus?.next === "otp";
+
   const otpLeft = otpUntil - now;
   const canResend = otpSent && otpLeft <= 0;
 
+  const changeNumber = () => {
+    setOtpSent(false);
+    setOtp("");
+    setDemoOtp(null);
+    setOtpUntil(0);
+    setPassword("");
+    setPhoneStatus(null);
+    setError("");
+  };
+
   return (
-    <form className={styles.form} onSubmit={handleBrokerLogin} noValidate>
+    <form
+      className={`${styles.form} ${isApp ? styles.app : ""}`}
+      onSubmit={isAdminPath ? handleAdminLogin : handleBrokerLogin}
+      noValidate
+    >
       <div className={styles.field}>
         <label htmlFor="phone">Mobile number</label>
         <input
@@ -122,38 +176,100 @@ export default function AuthForm() {
           value={phone}
           onChange={(e) => handlePhoneChange(e.target.value)}
           placeholder="10-digit mobile"
+          disabled={Boolean(isAdminPath || otpSent)}
           required
         />
       </div>
 
-      {!otpSent ? (
+      {!phoneStatus?.canLogin ? (
+        <button
+          type="button"
+          className={styles.submit}
+          disabled={checking || !isValidPhone(phone)}
+          onClick={handleCheckPhone}
+        >
+          {checking ? "Checking…" : isApp ? "Continue →" : "Continue"}
+        </button>
+      ) : null}
+
+      {isAdminPath ? (
         <>
-          {!canSendOtp ? (
-            <button
-              type="button"
-              className={styles.submit}
-              disabled={checking || !isValidPhone(phone)}
-              onClick={handleCheckPhone}
-            >
-              {checking ? "Checking…" : "Continue"}
-            </button>
-          ) : (
-            <>
-              <p className={styles.fieldOk}>
-                Number registered. Send OTP to sign in.
-              </p>
+          <p className={styles.fieldOk}>
+            Enter your 4-digit password.
+          </p>
+          <div className={styles.field}>
+            <div className={styles.labelRow}>
+              <label htmlFor="admin-password">Password</label>
               <button
                 type="button"
-                className={styles.submit}
-                disabled={sending}
-                onClick={handleSendOtp}
+                className={styles.toggle}
+                onClick={() => setShowPassword((v) => !v)}
+                aria-pressed={showPassword}
               >
-                {sending ? "Sending…" : "Send OTP"}
+                {showPassword ? "Hide" : "Show"}
               </button>
-            </>
-          )}
+            </div>
+            <input
+              id="admin-password"
+              type={showPassword ? "text" : "password"}
+              inputMode="numeric"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) =>
+                setPassword(e.target.value.replace(/\D/g, "").slice(0, 4))
+              }
+              placeholder="4-digit password"
+              required
+            />
+          </div>
+          <p className={styles.footerNote} style={{ textAlign: "left" }}>
+            Forgot password? Contact a super admin.
+          </p>
+          <button
+            type="button"
+            className={styles.linkBtn}
+            onClick={changeNumber}
+          >
+            Change number
+          </button>
+          <button
+            type="submit"
+            className={styles.submit}
+            disabled={submitting || !isValidAdminPin(password)}
+          >
+            {submitting
+              ? "Signing in…"
+              : isApp
+                ? "Sign In →"
+                : "Sign in"}
+          </button>
         </>
-      ) : (
+      ) : null}
+
+      {isBrokerPath && !otpSent ? (
+        <>
+          <p className={styles.fieldOk}>
+            Number registered. Send OTP to sign in.
+          </p>
+          <button
+            type="button"
+            className={styles.submit}
+            disabled={sending}
+            onClick={handleSendOtp}
+          >
+            {sending ? "Sending…" : "Send OTP"}
+          </button>
+          <button
+            type="button"
+            className={styles.linkBtn}
+            onClick={changeNumber}
+          >
+            Change number
+          </button>
+        </>
+      ) : null}
+
+      {isBrokerPath && otpSent ? (
         <>
           <div className={styles.otpBlock}>
             {demoOtp ? (
@@ -199,13 +315,7 @@ export default function AuthForm() {
               <button
                 type="button"
                 className={styles.linkBtn}
-                onClick={() => {
-                  setOtpSent(false);
-                  setOtp("");
-                  setDemoOtp(null);
-                  setOtpUntil(0);
-                  setError("");
-                }}
+                onClick={changeNumber}
               >
                 Change number
               </button>
@@ -217,10 +327,14 @@ export default function AuthForm() {
             className={styles.submit}
             disabled={submitting || otp.length !== 4}
           >
-            {submitting ? "Signing in…" : "Sign in"}
+            {submitting
+              ? "Signing in…"
+              : isApp
+                ? "Sign In →"
+                : "Sign in"}
           </button>
         </>
-      )}
+      ) : null}
 
       {error ? (
         <p className={styles.error} role="alert">
@@ -228,8 +342,22 @@ export default function AuthForm() {
         </p>
       ) : null}
 
+      {isApp ? (
+        <p className={styles.secureHint}>
+          <span className={styles.secureHintIcon} aria-hidden>
+            ✓
+          </span>
+          {isAdminPath
+            ? "Secure access · 4-digit PIN"
+            : "Secure OTP · Valid for 2 minutes"}
+        </p>
+      ) : null}
+
       <p className={styles.footerNote}>
-        New partner? <Link href="/register">Register</Link>
+        New partner?{" "}
+        <Link href="/register">
+          {isApp ? "Register now →" : "Register"}
+        </Link>
       </p>
     </form>
   );

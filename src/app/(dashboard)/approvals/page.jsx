@@ -6,6 +6,7 @@ import {
   fetchPendingBrokers,
   rejectBroker,
 } from "@/lib/brokerApi";
+import { setPendingCount } from "@/lib/pendingStore";
 import styles from "./approvals.module.css";
 
 export default function ApprovalsPage() {
@@ -19,7 +20,9 @@ export default function ApprovalsPage() {
     setLoading(true);
     try {
       const data = await fetchPendingBrokers();
-      setBrokers(data.brokers || []);
+      const list = data.brokers || [];
+      setBrokers(list);
+      setPendingCount(list.length);
     } catch (err) {
       setError(err.message || "Failed to load approvals");
     } finally {
@@ -36,7 +39,11 @@ export default function ApprovalsPage() {
     setError("");
     try {
       await approveBroker(id);
-      setBrokers((prev) => prev.filter((b) => b._id !== id));
+      setBrokers((prev) => {
+        const next = prev.filter((b) => b._id !== id);
+        setPendingCount(next.length);
+        return next;
+      });
     } catch (err) {
       setError(err.message || "Approve failed");
     } finally {
@@ -49,7 +56,11 @@ export default function ApprovalsPage() {
     setError("");
     try {
       await rejectBroker(id);
-      setBrokers((prev) => prev.filter((b) => b._id !== id));
+      setBrokers((prev) => {
+        const next = prev.filter((b) => b._id !== id);
+        setPendingCount(next.length);
+        return next;
+      });
     } catch (err) {
       setError(err.message || "Reject failed");
     } finally {

@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { ROLES } from "@/lib/nav";
+import { isStaffRole, isBrokerRole, staffLabel } from "@/lib/roles";
 import { APP_VERSION } from "@/lib/constants";
 import styles from "./page.module.css";
 
@@ -22,13 +23,6 @@ function capitalize(v) {
   if (!v) return "—";
   const s = String(v);
   return s.charAt(0).toUpperCase() + s.slice(1);
-}
-
-function roleLabel(user) {
-  if (!user?.role) return "—";
-  if (user.role === ROLES.ADMIN) return "Admin";
-  if (user.role === ROLES.BROKER) return "Channel Partner";
-  return capitalize(user.role);
 }
 
 function statusPillClass(status) {
@@ -53,19 +47,19 @@ export default function AccountPage() {
   const { user, logout } = useAuth();
   const [loggingOut, setLoggingOut] = useState(false);
 
-  const isAdmin = user?.role === ROLES.ADMIN;
-  const isBroker = user?.role === ROLES.BROKER;
+  const isStaff = isStaffRole(user?.role);
+  const isBroker = isBrokerRole(user?.role);
   const status = user?.status || (isBroker ? "approved" : null);
   const rera = user?.maharera || user?.rera;
   const displayName =
-    user?.name || (isAdmin ? "Admin" : null) || user?.email || "—";
+    user?.name || (isStaff ? "Admin" : null) || user?.email || "—";
 
   const onLogout = async () => {
     if (loggingOut) return;
     setLoggingOut(true);
     try {
       await logout();
-      router.replace(isAdmin ? "/admin/login" : "/login");
+      router.replace("/login");
     } finally {
       setLoggingOut(false);
     }
@@ -80,13 +74,13 @@ export default function AccountPage() {
       <section className={styles.card}>
         <p className={styles.label}>Signed in as</p>
         <p className={styles.name}>{displayName}</p>
-        <p className={styles.subtitle}>{roleLabel(user)}</p>
+        <p className={styles.subtitle}>{staffLabel(user?.role)}</p>
 
         <div className={styles.divider} />
 
         <div className={styles.metaRow}>
           <MetaCell label="Email" value={user?.email} />
-          {isBroker ? <MetaCell label="Phone" value={user?.phone} /> : null}
+          <MetaCell label="Phone" value={user?.phone} />
         </div>
       </section>
 
@@ -136,13 +130,19 @@ export default function AccountPage() {
         </section>
       ) : null}
 
-      {isAdmin ? (
+      {isStaff ? (
         <section className={styles.card}>
           <p className={styles.label}>Access</p>
-          <p className={styles.membershipId}>Admin console</p>
+          <p className={styles.membershipId}>{staffLabel(user?.role)}</p>
           <p className={styles.subtitle}>
-            Full platform management access
+            {user?.passwordResetBySuperAdmin
+              ? "Password reset pending — please update when you can."
+              : "Staff console access"}
           </p>
+          <div className={styles.divider} />
+          <Link href="/profile/password" className={styles.callBtn}>
+            Change password
+          </Link>
         </section>
       ) : null}
 

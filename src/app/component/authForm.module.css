@@ -410,3 +410,105 @@
 .footerNote a:hover {
   color: #e6cf94;
 }
+
+/* —— App theme (login only via theme="app") —— */
+.app {
+  gap: 0.95rem;
+}
+
+.app .field label {
+  color: var(--ink-muted);
+  letter-spacing: 0.1em;
+}
+
+.app .field input {
+  min-height: 52px;
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: 500;
+  background: #f7f8fa;
+  border-color: #e2e5ea;
+  color: #1a1f2b;
+}
+
+.app .field input::placeholder {
+  color: #8b909a;
+  font-weight: 500;
+}
+
+.app .field input:focus {
+  border-color: #c5a059;
+  box-shadow: none;
+  background: #ffffff;
+}
+
+.app .otpInputWide {
+  min-height: 52px;
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: 500;
+  background: #f7f8fa;
+  border-color: #e2e5ea;
+  color: #1a1f2b;
+}
+
+.app .otpInputWide:focus {
+  border-color: #c5a059;
+  box-shadow: none;
+  background: #ffffff;
+}
+
+.app .submit {
+  min-height: 52px;
+  border-radius: 14px;
+  background: #1a1f2b;
+  color: #ffffff;
+  font-size: 1rem;
+}
+
+.app .submit:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.app .submit:disabled {
+  opacity: 0.4;
+}
+
+.app .error {
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  color: #d35b5b;
+  font-size: 0.8125rem;
+}
+
+.app .footerNote {
+  color: #8b909a;
+}
+
+.app .footerNote a {
+  color: #c5a059;
+  font-weight: 700;
+}
+
+.app .fieldOk {
+  color: #2e7d32;
+}
+
+.secureHint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  margin: 0;
+  font-size: 0.6875rem;
+  color: #8b909a;
+  text-align: center;
+}
+
+.secureHintIcon {
+  color: #c5a059;
+  font-size: 0.75rem;
+  line-height: 1;
+}

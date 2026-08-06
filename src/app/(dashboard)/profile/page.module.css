@@ -159,6 +159,11 @@
   border: none;
   background: #f2ede4;
   color: #0a0a0a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-sizing: border-box;
 }
 
 .callBtn:hover {

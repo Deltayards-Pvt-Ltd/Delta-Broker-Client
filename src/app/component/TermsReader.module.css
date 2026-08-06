@@ -17,7 +17,7 @@
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #c2a366;
+  color: #c5a059;
   line-height: 1.35;
   max-width: 70%;
 }
@@ -34,7 +34,7 @@
   font-size: 0.95rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  color: #e6cf94;
+  color: #1a1f2b;
 }
 
 .pctLabel {
@@ -42,47 +42,47 @@
   font-weight: 650;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #a89f8f;
+  color: #8b909a;
 }
 
 .progressTrack {
   height: 3px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(26, 31, 43, 0.1);
   overflow: hidden;
 }
 
 .progressFill {
   height: 100%;
   border-radius: inherit;
-  background: #c2a366;
+  background: #c5a059;
   transition: width 0.1s linear;
 }
 
 .hint,
 .hintDone {
   margin: 0;
-  font-size: 0.88rem;
+  font-size: 0.8125rem;
   line-height: 1.45;
 }
 
 .hint {
-  color: #d8cfc0;
+  color: #8b909a;
 }
 
 .hintDone {
-  color: #5dde7a;
+  color: #2e7d32;
   font-weight: 650;
 }
 
 .paperShell {
   height: min(52vh, 480px);
   min-height: 320px;
-  border-radius: 1rem;
+  border-radius: 18px;
   overflow: hidden;
-  border: 1px solid rgba(197, 160, 89, 0.28);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
-  background: #f4efe6;
+  border: 1px solid #e2e5ea;
+  box-shadow: 0 10px 24px rgba(26, 31, 43, 0.1);
+  background: #ffffff;
 }
 
 .scroller {

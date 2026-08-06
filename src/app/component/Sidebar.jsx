@@ -6,7 +6,9 @@ import { usePathname } from "next/navigation";
 import { ChevronDown, X } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { NAV_ITEMS, navForRole } from "@/lib/nav";
+import { isStaffRole, staffLabel } from "@/lib/roles";
 import { NavIcon } from "@/app/component/NavIcon";
+import { useStaffPendingCount } from "@/lib/usePendingCount";
 import styles from "./Sidebar.module.css";
 
 function isActive(pathname, href) {
@@ -19,12 +21,20 @@ function sectionOpen(pathname, children) {
   );
 }
 
+function CountBadge({ count }) {
+  if (!count || count <= 0) return null;
+  return (
+    <span className={styles.badge}>{count > 99 ? "99+" : count}</span>
+  );
+}
+
 export default function Sidebar({ open, onClose, persistent }) {
   const pathname = usePathname();
   const { user } = useAuth();
   const role = user?.role || "broker";
   const items = navForRole(NAV_ITEMS, role);
   const [expanded, setExpanded] = useState({});
+  const pending = useStaffPendingCount(user, { fetchOnMount: true });
 
   useEffect(() => {
     const next = {};
@@ -42,6 +52,17 @@ export default function Sidebar({ open, onClose, persistent }) {
 
   const handleNav = () => {
     if (!persistent) onClose?.();
+  };
+
+  const badgeFor = (item) => {
+    if (item.id === "approvals") return pending;
+    if (item.id === "brokers") return pending;
+    return 0;
+  };
+
+  const badgeForChild = (child) => {
+    if (child.id === "brokers-pending") return pending;
+    return 0;
   };
 
   return (
@@ -63,12 +84,18 @@ export default function Sidebar({ open, onClose, persistent }) {
         <div className={styles.head}>
           <div className={styles.brandBlock}>
             <span className={styles.logoMark} aria-hidden>
-              DCP
+              <img
+                src="/new_logo.png"
+                alt=""
+                className={styles.logoImg}
+                width={28}
+                height={28}
+              />
             </span>
             <div className={styles.brandText}>
-              <span className={styles.brand}>DCP</span>
+              <span className={styles.brand}>DELTA YARDS</span>
               <span className={styles.brandSub}>
-                {role === "admin" ? "Admin" : "Channel Partner"}
+                {isStaffRole(role) ? staffLabel(role) : "Channel Partner"}
               </span>
             </div>
           </div>
@@ -90,13 +117,14 @@ export default function Sidebar({ open, onClose, persistent }) {
             if (item.children?.length) {
               const openSection = Boolean(expanded[item.id]);
               const parentActive = sectionOpen(pathname, item.children);
+              const parentBadge = badgeFor(item);
               return (
                 <div key={item.id} className={styles.group}>
                   <button
                     type="button"
                     className={`${styles.groupBtn} ${
                       parentActive ? styles.activeParent : ""
-                    }`}
+                    } ${parentBadge > 0 ? styles.hasBadge : ""}`}
                     onClick={() => toggleSection(item.id)}
                     aria-expanded={openSection}
                   >
@@ -106,14 +134,17 @@ export default function Sidebar({ open, onClose, persistent }) {
                       </span>
                       {item.label}
                     </span>
-                    <ChevronDown
-                      size={16}
-                      strokeWidth={1.75}
-                      className={`${styles.chevron} ${
-                        openSection ? styles.chevronOpen : ""
-                      }`}
-                      aria-hidden
-                    />
+                    <span className={styles.itemEnd}>
+                      <CountBadge count={parentBadge} />
+                      <ChevronDown
+                        size={16}
+                        strokeWidth={1.75}
+                        className={`${styles.chevron} ${
+                          openSection ? styles.chevronOpen : ""
+                        }`}
+                        aria-hidden
+                      />
+                    </span>
                   </button>
 
                   <div
@@ -122,39 +153,45 @@ export default function Sidebar({ open, onClose, persistent }) {
                     }`}
                   >
                     <div className={styles.subInner}>
-                      {item.children.map((child) => (
-                        <Link
-                          key={child.id}
-                          href={child.href}
-                          className={`${styles.subLink} ${
-                            isActive(pathname, child.href)
-                              ? styles.activeSub
-                              : ""
-                          }`}
-                          onClick={handleNav}
-                        >
-                          {child.label}
-                        </Link>
-                      ))}
+                      {item.children.map((child) => {
+                        const childBadge = badgeForChild(child);
+                        return (
+                          <Link
+                            key={child.id}
+                            href={child.href}
+                            className={`${styles.subLink} ${
+                              isActive(pathname, child.href)
+                                ? styles.activeSub
+                                : ""
+                            } ${childBadge > 0 ? styles.hasBadge : ""}`}
+                            onClick={handleNav}
+                          >
+                            <span>{child.label}</span>
+                            <CountBadge count={childBadge} />
+                          </Link>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
               );
             }
 
+            const itemBadge = badgeFor(item);
             return (
               <Link
                 key={item.id}
                 href={item.href}
                 className={`${styles.link} ${
                   isActive(pathname, item.href) ? styles.active : ""
-                }`}
+                } ${itemBadge > 0 ? styles.hasBadge : ""}`}
                 onClick={handleNav}
               >
                 <span className={styles.iconWrap}>
                   <NavIcon name={item.icon} />
                 </span>
-                {item.label}
+                <span className={styles.linkLabel}>{item.label}</span>
+                <CountBadge count={itemBadge} />
               </Link>
             );
           })}

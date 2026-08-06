@@ -342,7 +342,35 @@ export default function RegisterForm({
     }
   };
 
-  const renderOtpBlock = ({
+
+  const renderContactAction = ({
+    canSend,
+    verified,
+    active,
+    expiredSame,
+    onSend,
+    sendBusy,
+  }) => {
+    if (verified) {
+      return <span className={styles.verifiedPill}>Verified</span>;
+    }
+
+    const sent = active || expiredSame;
+    if (sent) return null;
+
+    return (
+      <button
+        type="button"
+        className={styles.sendBtn}
+        onClick={onSend}
+        disabled={sendBusy || !canSend}
+      >
+        {sendBusy ? "…" : "Send OTP"}
+      </button>
+    );
+  };
+
+  const renderOtpRow = ({
     canSend,
     verified,
     active,
@@ -354,49 +382,22 @@ export default function RegisterForm({
     onVerify,
     sendBusy,
     verifyBusy,
-    sendLabel,
-    verifyLabel,
     demoOtp,
     hint,
   }) => {
-    if (verified) {
-      return (
-        <label className={styles.verifiedBox}>
-          <input type="checkbox" checked readOnly tabIndex={-1} />
-          <span>{verifyLabel.replace(/^Verify\s+/i, "")} verified</span>
-        </label>
-      );
-    }
-
+    if (verified) return null;
     const sent = active || expiredSame;
+    if (!sent) return null;
 
-    // Before send — only Send OTP
-    if (!sent) {
-      return (
-        <div className={styles.otpActions}>
-          <button
-            type="button"
-            className={styles.sendBtn}
-            onClick={onSend}
-            disabled={sendBusy || !canSend}
-          >
-            {sendBusy ? "Sending…" : sendLabel}
-          </button>
-        </div>
-      );
-    }
-
-    // After send — OTP input + Verify + timer/resend
     return (
-      <div className={styles.otpBlock}>
+      <div className={styles.otpFollow}>
         {hint ? <p className={styles.otpHint}>{hint}</p> : null}
         {demoOtp ? (
           <p className={styles.demoOtp}>
-            Demo OTP: <strong>{demoOtp}</strong>
+            Demo: <strong>{demoOtp}</strong>
           </p>
         ) : null}
-
-        <div className={styles.otpRow}>
+        <div className={styles.inputRow}>
           <input
             type="text"
             inputMode="numeric"
@@ -415,17 +416,18 @@ export default function RegisterForm({
             onClick={onVerify}
             disabled={verifyBusy || otpValue.length !== 4}
           >
-            {verifyBusy ? "Verifying…" : verifyLabel}
+            {verifyBusy ? "…" : "Verify"}
           </button>
         </div>
-
         <div className={styles.otpMeta}>
           {active ? (
-            <span className={styles.timer}>Resend in {formatRemain(remain)}</span>
+            <span className={styles.timer}>
+              Resend in {formatRemain(remain)}
+            </span>
           ) : (
             <button
               type="button"
-              className={styles.sendBtn}
+              className={styles.linkBtn}
               onClick={onSend}
               disabled={sendBusy || !canSend}
             >
@@ -449,8 +451,17 @@ export default function RegisterForm({
     >
       {step === 1 ? (
         <>
+          <div className={styles.introBlock}>
+            <p className={styles.eyebrow}>New partner</p>
+            <h2 className={styles.heading}>Create your account</h2>
+            <p className={styles.subtitle}>
+              Register to apply. An admin reviews every application — you&apos;ll
+              be notified once approved.
+            </p>
+          </div>
+
           <div className={styles.field}>
-            <span className={styles.label}>Account type</span>
+            <span className={styles.label}>Registering as</span>
             <div className={styles.typeSwitch} role="group" aria-label="Account type">
               <button
                 type="button"
@@ -473,113 +484,155 @@ export default function RegisterForm({
             </div>
           </div>
 
-          <div className={styles.field}>
-            <label htmlFor="name">Full name</label>
-            <input
-              id="name"
-              type="text"
-              autoComplete="name"
-              value={form.name}
-              onChange={(e) => setField("name", e.target.value)}
-              placeholder="Your full name"
-              required
-            />
+          <div className={styles.row2}>
+            <div className={styles.field}>
+              <label htmlFor="name">Full name</label>
+              <input
+                id="name"
+                type="text"
+                autoComplete="name"
+                value={form.name}
+                onChange={(e) => setField("name", e.target.value)}
+                placeholder="Your full name"
+                required
+              />
+            </div>
+
+            {isCompany ? (
+              <div className={styles.field}>
+                <label htmlFor="firmName">Firm name</label>
+                <input
+                  id="firmName"
+                  type="text"
+                  autoComplete="organization"
+                  value={form.firmName}
+                  onChange={(e) => setField("firmName", e.target.value)}
+                  placeholder="Registered firm / company name"
+                  required
+                />
+              </div>
+            ) : (
+              <div className={styles.field}>
+                <label htmlFor="maharera">
+                  RERA <span className={styles.optional}>(optional)</span>
+                </label>
+                <input
+                  id="maharera"
+                  type="text"
+                  value={form.maharera}
+                  onChange={(e) =>
+                    setField("maharera", e.target.value.toUpperCase())
+                  }
+                  placeholder="A51800000000"
+                />
+              </div>
+            )}
           </div>
 
           {isCompany ? (
             <div className={styles.field}>
-              <label htmlFor="firmName">Firm name</label>
+              <label htmlFor="maharera-co">
+                RERA <span className={styles.optional}>(optional)</span>
+              </label>
               <input
-                id="firmName"
+                id="maharera-co"
                 type="text"
-                autoComplete="organization"
-                value={form.firmName}
-                onChange={(e) => setField("firmName", e.target.value)}
-                placeholder="Registered firm / company name"
-                required
+                value={form.maharera}
+                onChange={(e) =>
+                  setField("maharera", e.target.value.toUpperCase())
+                }
+                placeholder="A51800000000"
               />
             </div>
           ) : null}
 
-          <div className={styles.field}>
-            <label htmlFor="reg-email">Email ID</label>
-            <input
-              id="reg-email"
-              type="email"
-              autoComplete="email"
-              value={form.email}
-              onChange={(e) => setField("email", e.target.value)}
-              onBlur={handleEmailBlur}
-              placeholder="name@email.com"
-              required
-              disabled={emailVerified}
-            />
-            {emailMsg ? <p className={styles.fieldError}>{emailMsg}</p> : null}
-            {renderOtpBlock({
-              canSend: emailOk || isValidEmail(form.email),
-              verified: emailVerified,
-              active: emailOtpActive,
-              expiredSame: emailOtpExpiredSame,
-              remain: emailRemain,
-              otpValue: emailOtp,
-              setOtpValue: setEmailOtp,
-              onSend: handleSendEmailOtp,
-              onVerify: handleVerifyEmailOtp,
-              sendBusy: otpBusy === "email-send",
-              verifyBusy: otpBusy === "email-verify",
-              sendLabel: "Send email OTP",
-              verifyLabel: "Verify email",
-              demoOtp: emailDemoOtp,
-              hint: emailHint,
-            })}
-          </div>
+          <div className={styles.row2}>
+            <div className={styles.field}>
+              <label htmlFor="reg-email">Email</label>
+              <div className={styles.inputRow}>
+                <input
+                  id="reg-email"
+                  type="email"
+                  autoComplete="email"
+                  value={form.email}
+                  onChange={(e) => setField("email", e.target.value)}
+                  onBlur={handleEmailBlur}
+                  placeholder="name@email.com"
+                  required
+                  disabled={emailVerified}
+                />
+                {renderContactAction({
+                  canSend: emailOk || isValidEmail(form.email),
+                  verified: emailVerified,
+                  active: emailOtpActive,
+                  expiredSame: emailOtpExpiredSame,
+                  onSend: handleSendEmailOtp,
+                  sendBusy: otpBusy === "email-send",
+                })}
+              </div>
+              {emailMsg ? <p className={styles.fieldError}>{emailMsg}</p> : null}
+              {renderOtpRow({
+                canSend: emailOk || isValidEmail(form.email),
+                verified: emailVerified,
+                active: emailOtpActive,
+                expiredSame: emailOtpExpiredSame,
+                remain: emailRemain,
+                otpValue: emailOtp,
+                setOtpValue: setEmailOtp,
+                onSend: handleSendEmailOtp,
+                onVerify: handleVerifyEmailOtp,
+                sendBusy: otpBusy === "email-send",
+                verifyBusy: otpBusy === "email-verify",
+                demoOtp: emailDemoOtp,
+                hint: emailHint,
+              })}
+            </div>
 
-          <div className={styles.field}>
-            <label htmlFor="phone">Mobile number</label>
-            <input
-              id="phone"
-              type="tel"
-              autoComplete="tel"
-              value={form.phone}
-              onChange={(e) =>
-                setField("phone", e.target.value.replace(/\D/g, "").slice(0, 10))
-              }
-              onBlur={handlePhoneBlur}
-              placeholder="98XXXXXXXX"
-              required
-              disabled={phoneVerified}
-            />
-            {phoneMsg ? <p className={styles.fieldError}>{phoneMsg}</p> : null}
-            {renderOtpBlock({
-              canSend: phoneOk || isValidPhone(form.phone),
-              verified: phoneVerified,
-              active: phoneOtpActive,
-              expiredSame: phoneOtpExpiredSame,
-              remain: phoneRemain,
-              otpValue: phoneOtp,
-              setOtpValue: setPhoneOtp,
-              onSend: handleSendPhoneOtp,
-              onVerify: handleVerifyPhoneOtp,
-              sendBusy: otpBusy === "phone-send",
-              verifyBusy: otpBusy === "phone-verify",
-              sendLabel: "Send mobile OTP",
-              verifyLabel: "Verify mobile",
-              demoOtp: phoneDemoOtp,
-              hint: phoneHint,
-            })}
-          </div>
-
-          <div className={styles.field}>
-            <label htmlFor="maharera">
-              RERA number <span className={styles.optional}>(optional)</span>
-            </label>
-            <input
-              id="maharera"
-              type="text"
-              value={form.maharera}
-              onChange={(e) => setField("maharera", e.target.value.toUpperCase())}
-              placeholder="A51800000000"
-            />
+            <div className={styles.field}>
+              <label htmlFor="phone">Mobile</label>
+              <div className={styles.inputRow}>
+                <input
+                  id="phone"
+                  type="tel"
+                  autoComplete="tel"
+                  value={form.phone}
+                  onChange={(e) =>
+                    setField(
+                      "phone",
+                      e.target.value.replace(/\D/g, "").slice(0, 10)
+                    )
+                  }
+                  onBlur={handlePhoneBlur}
+                  placeholder="98XXXXXXXX"
+                  required
+                  disabled={phoneVerified}
+                />
+                {renderContactAction({
+                  canSend: phoneOk || isValidPhone(form.phone),
+                  verified: phoneVerified,
+                  active: phoneOtpActive,
+                  expiredSame: phoneOtpExpiredSame,
+                  onSend: handleSendPhoneOtp,
+                  sendBusy: otpBusy === "phone-send",
+                })}
+              </div>
+              {phoneMsg ? <p className={styles.fieldError}>{phoneMsg}</p> : null}
+              {renderOtpRow({
+                canSend: phoneOk || isValidPhone(form.phone),
+                verified: phoneVerified,
+                active: phoneOtpActive,
+                expiredSame: phoneOtpExpiredSame,
+                remain: phoneRemain,
+                otpValue: phoneOtp,
+                setOtpValue: setPhoneOtp,
+                onSend: handleSendPhoneOtp,
+                onVerify: handleVerifyPhoneOtp,
+                sendBusy: otpBusy === "phone-send",
+                verifyBusy: otpBusy === "phone-verify",
+                demoOtp: phoneDemoOtp,
+                hint: phoneHint,
+              })}
+            </div>
           </div>
         </>
       ) : (
@@ -644,7 +697,7 @@ export default function RegisterForm({
         {submitting
           ? "Submitting…"
           : step === 1
-            ? "Continue"
+            ? "Continue to Terms →"
             : "Agree & submit registration →"}
       </button>
 

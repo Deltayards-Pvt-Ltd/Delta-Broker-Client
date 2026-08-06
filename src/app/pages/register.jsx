@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
@@ -30,7 +31,7 @@ export default function RegisterPage() {
 
   if (loading || isAuthenticated) {
     return (
-      <PartnerShell activeNav="register" wide>
+      <PartnerShell activeNav="register" variant="light" hideBrand>
         <div className={styles.loading}>Loading…</div>
       </PartnerShell>
     );
@@ -38,8 +39,19 @@ export default function RegisterPage() {
 
   if (done) {
     return (
-      <PartnerShell navMode="pending" wide>
-        <div className={`${styles.intro} ${styles.reveal}`}>
+      <PartnerShell navMode="pending" variant="light" hideBrand>
+        <div className={styles.brandHero}>
+          <Image
+            src="/loo_with_text.png"
+            alt="Delta Yards Channel Partner"
+            width={220}
+            height={132}
+            className={styles.brandHeroImg}
+            priority
+          />
+        </div>
+
+        <div className={`${styles.panel} ${styles.reveal}`}>
           <p className={styles.eyebrow}>Under review</p>
           <h1 className={styles.title}>Pending approval</h1>
           <p className={styles.copy}>
@@ -58,9 +70,11 @@ export default function RegisterPage() {
           </ol>
         </div>
 
-        <div className={`${styles.pendingActions} ${styles.reveal} ${styles.delay}`}>
+        <div
+          className={`${styles.pendingActions} ${styles.reveal} ${styles.delay}`}
+        >
           <Link href="/login" className={styles.pendingCta}>
-            Back to sign in
+            Back to sign in →
           </Link>
         </div>
       </PartnerShell>
@@ -68,20 +82,19 @@ export default function RegisterPage() {
   }
 
   return (
-    <PartnerShell activeNav="register" wide>
-      <div className={`${styles.intro} ${styles.reveal}`}>
-        <p className={styles.eyebrow}>Register & verify</p>
-        <h1 className={styles.title}>Join the partner network</h1>
-        <p className={styles.copy}>
-          Fill your details, verify email + mobile with OTP, then accept terms
-          to submit.
-        </p>
+    <PartnerShell activeNav="register" variant="light" hideBrand wide>
+      <div className={styles.brandHero}>
+        <Image
+          src="/loo_with_text.png"
+          alt="Delta Yards Channel Partner"
+          width={220}
+          height={132}
+          className={styles.brandHeroImg}
+          priority
+        />
       </div>
 
-      <div
-        className={`${styles.steps} ${styles.reveal} ${styles.delay}`}
-        aria-label="Registration steps"
-      >
+      <div className={styles.steps} aria-label="Registration steps">
         <div
           className={`${styles.step} ${
             step === 1 ? styles.stepActive : styles.stepDone
@@ -101,13 +114,11 @@ export default function RegisterPage() {
         </div>
       </div>
 
-      <div className={`${styles.reveal} ${styles.delay}`}>
-        <RegisterForm
-          step={step}
-          onStepChange={setStep}
-          onPendingDone={() => setDone(true)}
-        />
-      </div>
+      <RegisterForm
+        step={step}
+        onStepChange={setStep}
+        onPendingDone={() => setDone(true)}
+      />
     </PartnerShell>
   );
 }

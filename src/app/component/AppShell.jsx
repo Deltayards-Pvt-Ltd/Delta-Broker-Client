@@ -5,9 +5,11 @@ import AuthGuard from "@/app/component/AuthGuard";
 import RoleGuard from "@/app/component/RoleGuard";
 import Navbar from "@/app/component/Navbar";
 import Sidebar from "@/app/component/Sidebar";
+import { useTheme } from "@/context/ThemeContext";
 import styles from "./AppShell.module.css";
 
 export default function AppShell({ children }) {
+  const { isLight } = useTheme();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [desktop, setDesktop] = useState(false);
 
@@ -34,7 +36,9 @@ export default function AppShell({ children }) {
     <AuthGuard>
       <RoleGuard>
         <div
-          className={`${styles.shell} ${desktop ? styles.shellDesktop : ""}`}
+          className={`${styles.shell} ${
+            isLight ? styles.shellLight : styles.shellDark
+          }`}
         >
           <Sidebar
             open={desktop || sidebarOpen}

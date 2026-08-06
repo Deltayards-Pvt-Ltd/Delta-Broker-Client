@@ -50,6 +50,9 @@ export async function markAllNotificationsRead() {
 
 /** Where to go when clicking a notification */
 export function notificationHref(n) {
+  if (n?.type === "passwordResetNudge") {
+    return n?.meta?.link || "/profile/password";
+  }
   if (n?.type === "approvalRequired") return "/approvals";
   if (n?.type === "welcome" || n?.type === "approved") return "/projects";
   if (n?.type === "broadcast") {
@@ -57,5 +60,7 @@ export function notificationHref(n) {
     if (link) return link;
     return "/dashboard";
   }
+  const link = n?.meta?.link;
+  if (link) return link;
   return null;
 }
