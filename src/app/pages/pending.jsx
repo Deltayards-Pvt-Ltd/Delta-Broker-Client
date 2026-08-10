@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import PartnerShell from "@/app/component/PartnerShell";
 import { useAuth } from "@/context/AuthContext";
@@ -36,15 +35,23 @@ export default function PendingPage() {
 
   if (loading || !isAuthenticated || !isBrokerPending(user)) {
     return (
-      <PartnerShell navMode="pending" wide>
+      <PartnerShell navMode="pending" wide variant="light" hideBrand>
         <div className={styles.loading}>Loading…</div>
       </PartnerShell>
     );
   }
 
   return (
-    <PartnerShell navMode="pending" wide>
-      <div className={`${styles.intro} ${styles.reveal}`}>
+    <PartnerShell navMode="pending" wide variant="light" hideBrand>
+      <div className={`${styles.brandHero}`}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/new_logo.png"
+          alt="Delta Yards"
+          className={styles.brandHeroImg}
+        />
+      </div>
+      <div className={`${styles.panel} ${styles.reveal}`}>
         <p className={styles.eyebrow}>Under review</p>
         <h1 className={styles.title}>Pending approval</h1>
         <p className={styles.copy}>
