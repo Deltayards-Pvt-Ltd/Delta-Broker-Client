@@ -1,60 +1,68 @@
 :root {
-  /* DCP — native dark navy + gold */
+  /* Mobile-aligned DCP tokens */
   --primary: #c5a059;
   --primary-hover: #d4b06a;
-  --primary-soft: rgba(197, 160, 89, 0.14);
-  --primary-focus: rgba(197, 160, 89, 0.22);
+  --primary-soft: rgba(197, 160, 89, 0.16);
+  --primary-focus: rgba(197, 160, 89, 0.28);
   --primary-deep: #c5a059;
 
-  --bg: #050505;
-  --surface: rgba(16, 18, 28, 0.88);
-  --surface-muted: rgba(22, 24, 34, 0.92);
-  --sidebar-bg: rgba(10, 12, 20, 0.82);
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --surface-muted: #f7f8fa;
+  --sidebar-bg: #ffffff;
 
-  --ink: #ffffff;
-  --ink-body: #c8c8c8;
-  --ink-muted: #999999;
-  --ink-faint: #777777;
-  --on-primary: #0d0d0d;
+  --ink: #1a1f2b;
+  --ink-deep: #111827;
+  --ink-body: #1a1f2b;
+  --ink-muted: #8b909a;
+  --ink-faint: #9ca3af;
+  --on-primary: #ffffff;
 
-  --line: #2e2e2e;
-  --line-hover: #454545;
-  --line-strong: #ffffff;
+  --line: rgba(17, 24, 39, 0.1);
+  --line-hover: rgba(17, 24, 39, 0.16);
+  --line-strong: #1a1f2b;
 
-  --danger: #ef4444;
-  --danger-bg: rgba(239, 68, 68, 0.12);
-  --danger-border: rgba(239, 68, 68, 0.35);
-  --success: #28a745;
-  --success-soft: rgba(40, 167, 69, 0.16);
-  --warning: #f59e0b;
-  --warning-soft: rgba(245, 158, 11, 0.16);
+  --danger: #c62828;
+  --danger-bg: rgba(198, 40, 40, 0.1);
+  --danger-border: rgba(198, 40, 40, 0.28);
+  --success: #059669;
+  --success-soft: rgba(5, 150, 105, 0.12);
+  --warning: #b45309;
+  --warning-soft: rgba(180, 83, 9, 0.14);
   --info: #c5a059;
   --info-soft: rgba(197, 160, 89, 0.14);
 
-  --card-amber: rgba(245, 158, 11, 0.12);
-  --card-emerald: rgba(40, 167, 69, 0.12);
-  --card-red: rgba(239, 68, 68, 0.12);
-  --card-blue: rgba(197, 160, 89, 0.1);
-  --card-teal: rgba(197, 160, 89, 0.12);
-  --card-slate: #1a1a1a;
+  --card-amber: rgba(217, 119, 6, 0.1);
+  --card-emerald: rgba(5, 150, 105, 0.1);
+  --card-red: rgba(198, 40, 40, 0.1);
+  --card-blue: rgba(59, 130, 246, 0.1);
+  --card-teal: rgba(15, 118, 110, 0.1);
+  --card-slate: rgba(26, 31, 43, 0.04);
+
+  --plate: #ffffff;
+  --plate-dark: #1c1f27;
+  --glass-bg: #ffffff;
+  --glass-border: rgba(17, 24, 39, 0.1);
+  --glass-edge: rgba(255, 255, 255, 0.72);
 
   --radius-sm: 10px;
-  --radius: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 1rem;
+  --radius: 14px;
+  --radius-lg: 22px;
+  --radius-xl: 24px;
   --radius-pill: 999px;
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
-  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.35);
-  --shadow-lift: 0 12px 32px rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 2px 8px rgba(17, 24, 39, 0.06);
+  --shadow-card: 0 3px 10px rgba(17, 24, 39, 0.1);
+  --shadow-lift: 0 14px 32px rgba(17, 24, 39, 0.12);
 
   --sidebar-w: 268px;
   --nav-h: 64px;
-  --card-pad: 1.5rem;
+  --card-pad: 1.25rem;
   --content-max: 1400px;
-  --section-gap: 1.5rem;
-  --grid-gap: 1.25rem;
+  --section-gap: 1.25rem;
+  --grid-gap: 1rem;
   --form-max: 420px;
+  --pad-x: 20px;
 }
 
 html {
@@ -74,11 +82,7 @@ body {
   display: flex;
   flex-direction: column;
   color: var(--ink-body);
-  /* Same stack as login / register (native DCP theme) */
-  background:
-    radial-gradient(ellipse 70% 55% at 50% 28%, rgba(28, 42, 74, 0.55) 0%, transparent 62%),
-    radial-gradient(ellipse 50% 40% at 50% 10%, rgba(197, 160, 89, 0.08) 0%, transparent 50%),
-    linear-gradient(180deg, #0c1220 0%, #0a0c12 38%, #070708 72%, #050505 100%);
+  background: var(--bg);
   font-family: var(--font-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
   font-size: 16px;
   line-height: 1.5;
@@ -86,52 +90,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-body::before {
-  content: "";
-  position: fixed;
-  pointer-events: none;
-  z-index: 0;
-  width: min(70vw, 560px);
-  height: min(70vw, 560px);
-  top: 8%;
-  left: 50%;
-  transform: translateX(-50%);
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(40, 58, 98, 0.35) 0%,
-    rgba(197, 160, 89, 0.06) 42%,
-    transparent 70%
-  );
-  filter: blur(40px);
-}
-
-body::after {
-  content: "";
-  position: fixed;
-  inset: auto 0 0 0;
-  height: min(42vh, 360px);
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.22;
-  background-image:
-    linear-gradient(rgba(160, 170, 190, 0.14) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(160, 170, 190, 0.14) 1px, transparent 1px);
-  background-size: 28px 28px;
-  mask-image: linear-gradient(180deg, transparent 0%, #000 45%, #000 100%);
-  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 45%, #000 100%);
-}
-
 #__next,
 body > * {
   position: relative;
   z-index: 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  body::before {
-    filter: none;
-  }
 }
 
 * {
@@ -158,7 +120,9 @@ h2,
 h3,
 h4 {
   color: var(--ink);
-  line-height: 1.3;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
 }
 
 ::selection {
@@ -169,5 +133,50 @@ h4 {
 input,
 select,
 textarea {
-  color-scheme: dark;
+  color-scheme: light;
+}
+
+/* Utility: fog glass plate (mobile FogGlassCard) */
+.fogCard {
+  background: var(--plate);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+}
+
+.fogCardMuted {
+  background: var(--surface-muted);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+}
+
+.eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.badgeSolid {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: var(--radius-sm);
+  padding: 0.3rem 0.6rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #fff;
+  background: var(--ink);
+}
+
+.badgeSolidGold {
+  background: var(--primary);
+  color: var(--ink);
+}
+
+.badgeSolidAmber {
+  background: #b45309;
+  color: #fff;
 }

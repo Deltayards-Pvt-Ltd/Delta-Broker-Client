@@ -1,11 +1,5 @@
 import { API_URL, getToken } from "@/lib/auth";
 
-export const OFFER_AUDIENCES = [
-  { key: "all", label: "All brokers" },
-  { key: "categories", label: "Category" },
-  { key: "brokers", label: "Selected brokers" },
-];
-
 function authHeaders() {
   const token = getToken();
   return {

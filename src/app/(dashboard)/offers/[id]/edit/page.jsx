@@ -28,7 +28,8 @@ export default function EditOfferPage() {
         <div>
           <h1 className={styles.title}>Edit offer</h1>
           <p className={styles.sub}>
-            Update details, targeting, or re-broadcast to the audience.
+            Update dates or Active anytime. Past end dates auto-deactivate for
+            partners — extend the end date to bring an offer back live.
           </p>
         </div>
       </div>

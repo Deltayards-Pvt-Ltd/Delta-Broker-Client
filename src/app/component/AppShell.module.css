@@ -8,7 +8,7 @@
   color: var(--ink-body);
 }
 
-/* —— Light (app default) —— */
+/* —— Light (mobile canvas) —— */
 .shellLight {
   --primary: #c5a059;
   --primary-hover: #d4b06a;
@@ -16,79 +16,59 @@
   --primary-focus: rgba(197, 160, 89, 0.28);
   --primary-deep: #c5a059;
 
-  --bg: #e8eef4;
-  --surface: rgba(255, 255, 255, 0.72);
+  --bg: #f4f6f8;
+  --surface: #ffffff;
   --surface-muted: #f7f8fa;
-  --sidebar-bg: rgba(255, 255, 255, 0.78);
+  --sidebar-bg: #ffffff;
 
   --ink: #1a1f2b;
+  --ink-deep: #111827;
   --ink-body: #1a1f2b;
   --ink-muted: #8b909a;
-  --ink-faint: #8b909a;
+  --ink-faint: #9ca3af;
   --on-primary: #ffffff;
 
-  --line: #e2e5ea;
-  --line-hover: #c8cdd5;
+  --line: rgba(17, 24, 39, 0.1);
+  --line-hover: rgba(17, 24, 39, 0.16);
   --line-strong: #1a1f2b;
 
-  --danger: #d35b5b;
-  --danger-bg: rgba(211, 91, 91, 0.1);
-  --danger-border: rgba(211, 91, 91, 0.28);
+  --danger: #c62828;
+  --danger-bg: rgba(198, 40, 40, 0.1);
+  --danger-border: rgba(198, 40, 40, 0.28);
   --success: #059669;
   --success-soft: rgba(5, 150, 105, 0.12);
-  --warning: #d97706;
-  --warning-soft: rgba(217, 119, 6, 0.12);
-  --info: #2563eb;
-  --info-soft: rgba(37, 99, 235, 0.12);
+  --warning: #b45309;
+  --warning-soft: rgba(180, 83, 9, 0.14);
+  --info: #c5a059;
+  --info-soft: rgba(197, 160, 89, 0.14);
 
   --card-amber: rgba(217, 119, 6, 0.1);
   --card-emerald: rgba(5, 150, 105, 0.1);
-  --card-red: rgba(211, 91, 91, 0.1);
-  --card-blue: rgba(37, 99, 235, 0.1);
+  --card-red: rgba(198, 40, 40, 0.1);
+  --card-blue: rgba(59, 130, 246, 0.1);
   --card-teal: rgba(15, 118, 110, 0.1);
   --card-slate: rgba(26, 31, 43, 0.04);
 
-  --glass-bg: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.78) 0%,
-      rgba(255, 255, 255, 0.42) 55%,
-      rgba(255, 255, 255, 0.28) 100%
-    ),
-    rgba(255, 255, 255, 0.55);
-  --glass-border: rgba(255, 255, 255, 0.75);
-  --nav-bg: rgba(255, 255, 255, 0.65);
-  --sidebar-fill: rgba(255, 255, 255, 0.78);
-  --sidebar-border: rgba(255, 255, 255, 0.85);
+  --plate: #ffffff;
+  --glass-bg: #ffffff;
+  --glass-border: rgba(17, 24, 39, 0.1);
+  --nav-bg: rgba(255, 255, 255, 0.94);
+  --sidebar-fill: #ffffff;
+  --sidebar-border: rgba(17, 24, 39, 0.1);
   --welcome-accent: #1a1f2b;
 
-  --shadow-sm: 0 2px 8px rgba(26, 31, 43, 0.06);
-  --shadow-card: 0 10px 24px rgba(26, 31, 43, 0.08);
-  --shadow-lift: 0 14px 32px rgba(26, 31, 43, 0.12);
+  --shadow-sm: 0 2px 8px rgba(17, 24, 39, 0.06);
+  --shadow-card: 0 3px 10px rgba(17, 24, 39, 0.1);
+  --shadow-lift: 0 14px 32px rgba(17, 24, 39, 0.12);
 
-  background: linear-gradient(180deg, #b7d0e8 0%, #d8e4ef 42%, #e8eef4 100%);
+  background: #f4f6f8;
 }
 
 .shellLight::before {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-  z-index: 0;
-  width: min(70vw, 520px);
-  height: min(70vw, 520px);
-  top: -12%;
-  left: 42%;
-  transform: translateX(-50%);
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.55) 0%,
-    rgba(183, 208, 232, 0.2) 45%,
-    transparent 70%
-  );
-  filter: blur(28px);
+  content: none;
 }
 
-/* —— Dark —— */
+/* —— Dark (mobile canvas) —— */
 .shellDark {
   --primary: #c5a059;
   --primary-hover: #d4b06a;
@@ -96,16 +76,17 @@
   --primary-focus: rgba(197, 160, 89, 0.22);
   --primary-deep: #c5a059;
 
-  --bg: #000000;
-  --surface: rgba(36, 38, 47, 0.72);
-  --surface-muted: rgba(28, 30, 38, 0.92);
-  --sidebar-bg: rgba(10, 12, 20, 0.92);
+  --bg: #0a0a0a;
+  --surface: #1c1f27;
+  --surface-muted: rgba(28, 31, 39, 0.92);
+  --sidebar-bg: #0a0a0a;
 
   --ink: #ffffff;
+  --ink-deep: #ffffff;
   --ink-body: #ffffff;
   --ink-muted: rgba(255, 255, 255, 0.5);
   --ink-faint: rgba(255, 255, 255, 0.35);
-  --on-primary: #0d0d0d;
+  --on-primary: #1a1f2b;
 
   --line: rgba(255, 255, 255, 0.14);
   --line-hover: rgba(255, 255, 255, 0.22);
@@ -118,8 +99,8 @@
   --success-soft: rgba(52, 211, 153, 0.14);
   --warning: #fbbf24;
   --warning-soft: rgba(251, 191, 36, 0.14);
-  --info: #60a5fa;
-  --info-soft: rgba(96, 165, 250, 0.14);
+  --info: #c5a059;
+  --info-soft: rgba(197, 160, 89, 0.14);
 
   --card-amber: rgba(251, 191, 36, 0.12);
   --card-emerald: rgba(52, 211, 153, 0.12);
@@ -128,28 +109,30 @@
   --card-teal: rgba(45, 212, 191, 0.12);
   --card-slate: rgba(255, 255, 255, 0.04);
 
-  --glass-bg: linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.1) 0%,
-      rgba(255, 255, 255, 0.02) 55%,
-      rgba(0, 0, 0, 0.12) 100%
-    ),
-    rgba(36, 38, 47, 0.72);
+  --plate: #1c1f27;
+  --glass-bg: #1c1f27;
   --glass-border: rgba(255, 255, 255, 0.14);
-  --nav-bg: rgba(10, 12, 20, 0.82);
-  --sidebar-fill: rgba(10, 12, 20, 0.92);
-  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --nav-bg: rgba(28, 30, 38, 0.92);
+  --sidebar-fill: #0a0a0a;
+  --sidebar-border: rgba(255, 255, 255, 0.12);
   --welcome-accent: #c5a059;
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
-  --shadow-card: 0 10px 28px rgba(0, 0, 0, 0.4);
+  --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.4);
   --shadow-lift: 0 14px 36px rgba(0, 0, 0, 0.5);
 
-  background: #000000;
+  background: #0a0a0a;
+  color-scheme: dark;
 }
 
 .shellDark::before {
   content: none;
+}
+
+.shellDark input,
+.shellDark select,
+.shellDark textarea {
+  color-scheme: dark;
 }
 
 .main {

@@ -7,19 +7,10 @@
   margin: 0 auto;
   padding: clamp(1.25rem, 3vw, 1.6rem) clamp(1.25rem, 3vw, 1.6rem)
     clamp(1.1rem, 2.5vw, 1.35rem);
-  border-radius: 28px;
-  background:
-    linear-gradient(
-      135deg,
-      rgba(255, 255, 255, 0.72) 0%,
-      rgba(255, 255, 255, 0.42) 48%,
-      rgba(255, 255, 255, 0.28) 100%
-    ),
-    rgba(255, 255, 255, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.7);
-  box-shadow: 0 14px 28px rgba(26, 31, 43, 0.12);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+  border-radius: 24px;
+  background: #ffffff;
+  border: 1px solid rgba(17, 24, 39, 0.1);
+  box-shadow: 0 3px 10px rgba(17, 24, 39, 0.1);
 }
 
 .panelWide {

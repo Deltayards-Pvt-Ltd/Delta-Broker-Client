@@ -256,9 +256,17 @@ export default function HomePage() {
             </>
           ) : (
             <>
+              <Link href="/offers" className={styles.quickCard}>
+                <strong>Offers</strong>
+                <span>Partner schemes & incentives</span>
+              </Link>
               <Link href="/projects" className={styles.quickCard}>
                 <strong>Browse projects</strong>
                 <span>Active inventory & details</span>
+              </Link>
+              <Link href="/updates" className={styles.quickCard}>
+                <strong>Updates</strong>
+                <span>Inbox & broadcasts</span>
               </Link>
               <Link href="/profile" className={styles.quickCard}>
                 <strong>Your account</strong>

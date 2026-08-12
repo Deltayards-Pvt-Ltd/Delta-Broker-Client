@@ -10,7 +10,7 @@ export default function PartnerShell({
   wide = false,
   /** pending = hide Sign in / Register / Admin */
   navMode = "default",
-  /** light = app sky / glass theme */
+  /** light = flat canvas theme matching mobile */
   variant = "dark",
   /** hide text/logo brand when page shows its own hero logo */
   hideBrand = false,

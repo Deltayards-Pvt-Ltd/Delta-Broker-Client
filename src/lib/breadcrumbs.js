@@ -17,6 +17,7 @@ export function breadcrumbsFromPath(pathname) {
     approved: "Approved",
     pending: "Pending",
     rejected: "Rejected",
+    categories: "Categories",
     active: "Active",
     closed: "Closed",
     new: "Add",
@@ -27,8 +28,18 @@ export function breadcrumbsFromPath(pathname) {
   const crumbs = [{ label: "Dashboard", href: "/dashboard" }];
   let acc = "";
 
-  for (const part of parts) {
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i];
     acc += `/${part}`;
+    const next = parts[i + 1];
+
+    // Skip raw Mongo ids in the trail (e.g. /offers/:id/edit → Offers / Edit)
+    if (/^[a-f\d]{24}$/i.test(part)) {
+      if (next === "edit") continue;
+      crumbs.push({ label: "Details", href: acc });
+      continue;
+    }
+
     const label = map[part] || decodeURIComponent(part).replace(/-/g, " ");
     crumbs.push({
       label: label.charAt(0).toUpperCase() + label.slice(1),

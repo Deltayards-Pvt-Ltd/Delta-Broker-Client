@@ -5,6 +5,7 @@ import {
   BadgeCheck,
   LayoutDashboard,
   Bell,
+  Gift,
 } from "lucide-react";
 
 const ICONS = {
@@ -14,6 +15,7 @@ const ICONS = {
   check: BadgeCheck,
   dashboard: LayoutDashboard,
   bell: Bell,
+  gift: Gift,
 };
 
 export function NavIcon({ name, size = 18 }) {

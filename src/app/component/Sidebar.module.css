@@ -137,7 +137,8 @@
 }
 
 .link,
-.groupBtn {
+.groupBtn,
+.groupRow {
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -188,21 +189,22 @@
 }
 
 .link:hover,
-.groupBtn:hover {
-  background: rgba(197, 160, 89, 0.12);
-  color: #c5a059;
+.groupBtn:hover,
+.groupRow:hover {
+  background: rgba(26, 31, 43, 0.05);
+  color: var(--ink);
 }
 
 .active {
-  background: rgba(197, 160, 89, 0.16);
-  color: #c5a059;
-  border: 1px solid rgba(197, 160, 89, 0.4);
-  font-weight: 650;
+  background: var(--ink);
+  color: var(--bg);
+  border: 1px solid var(--ink);
+  font-weight: 700;
 }
 
 .active:hover {
-  background: var(--primary-soft);
-  color: var(--primary-hover);
+  background: var(--ink);
+  color: var(--bg);
 }
 
 .iconWrap {
@@ -227,6 +229,54 @@
   text-align: left;
 }
 
+.groupRow {
+  width: 100%;
+  gap: 0.25rem;
+  padding: 0.25rem 0.35rem 0.25rem 0.35rem;
+  justify-content: space-between;
+}
+
+.groupLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+  min-height: 42px;
+  padding: 0.4rem 0.5rem;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: inherit;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.groupLink:hover {
+  color: #c5a059;
+}
+
+.chevronBtn {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.chevronBtn:hover {
+  background: rgba(197, 160, 89, 0.14);
+}
+
 .itemMain {
   display: inline-flex;
   align-items: center;
@@ -234,9 +284,9 @@
 }
 
 .activeParent {
-  color: var(--primary);
-  background: var(--primary-soft);
-  font-weight: 600;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+  font-weight: 700;
 }
 
 .chevron {
@@ -290,9 +340,9 @@
 }
 
 .activeSub {
-  background: var(--primary-soft);
-  color: var(--primary);
-  font-weight: 600;
+  background: color-mix(in srgb, var(--ink) 10%, transparent);
+  color: var(--ink);
+  font-weight: 700;
 }
 
 @media (prefers-reduced-motion: reduce) {

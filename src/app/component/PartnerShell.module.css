@@ -3,11 +3,37 @@
   isolation: isolate;
   min-height: 100dvh;
   overflow-x: hidden;
-  color: #f3efe6;
-  background: transparent;
+  color: #ffffff;
+  background: #0a0a0a;
+
+  --primary: #c5a059;
+  --primary-hover: #d4b06a;
+  --primary-soft: rgba(197, 160, 89, 0.14);
+  --primary-focus: rgba(197, 160, 89, 0.22);
+  --primary-deep: #c5a059;
+
+  --bg: #0a0a0a;
+  --surface: #ffffff;
+  --surface-muted: #f7f8fa;
+
+  --ink: #1a1f2b;
+  --ink-body: #1a1f2b;
+  --ink-muted: #8b909a;
+  --ink-faint: #9ca3af;
+  --on-primary: #ffffff;
+
+  --line: rgba(17, 24, 39, 0.1);
+  --line-hover: rgba(17, 24, 39, 0.16);
+  --line-strong: #1a1f2b;
+
+  --danger: #c62828;
+  --danger-bg: rgba(198, 40, 40, 0.1);
+  --danger-border: rgba(198, 40, 40, 0.28);
+  --success: #059669;
+  --success-soft: rgba(5, 150, 105, 0.12);
 }
 
-/* App light theme — sky wash + ink chrome */
+/* App light theme — flat canvas like mobile */
 .pageLight {
   position: relative;
   isolation: isolate;
@@ -21,48 +47,32 @@
   --primary-focus: rgba(197, 160, 89, 0.28);
   --primary-deep: #c5a059;
 
-  --bg: #e8eef4;
+  --bg: #f4f6f8;
   --surface: #ffffff;
   --surface-muted: #f7f8fa;
-  --sidebar-bg: #e8eef4;
+  --sidebar-bg: #f4f6f8;
 
   --ink: #1a1f2b;
   --ink-body: #1a1f2b;
   --ink-muted: #8b909a;
-  --ink-faint: #8b909a;
+  --ink-faint: #9ca3af;
   --on-primary: #ffffff;
 
-  --line: #e2e5ea;
-  --line-hover: #c8cdd5;
+  --line: rgba(17, 24, 39, 0.1);
+  --line-hover: rgba(17, 24, 39, 0.16);
   --line-strong: #1a1f2b;
 
-  --danger: #d35b5b;
-  --danger-bg: rgba(211, 91, 91, 0.1);
-  --danger-border: rgba(211, 91, 91, 0.28);
+  --danger: #c62828;
+  --danger-bg: rgba(198, 40, 40, 0.1);
+  --danger-border: rgba(198, 40, 40, 0.28);
   --success: #059669;
   --success-soft: rgba(5, 150, 105, 0.12);
 
-  background: linear-gradient(180deg, #b7d0e8 0%, #d8e4ef 45%, #e8eef4 100%);
+  background: #f4f6f8;
 }
 
 .pageLight::before {
-  content: "";
-  position: absolute;
-  pointer-events: none;
-  z-index: 0;
-  width: min(80vw, 520px);
-  height: min(80vw, 520px);
-  top: -8%;
-  left: 50%;
-  transform: translateX(-50%);
-  border-radius: 50%;
-  background: radial-gradient(
-    circle,
-    rgba(255, 255, 255, 0.55) 0%,
-    rgba(183, 208, 232, 0.2) 45%,
-    transparent 70%
-  );
-  filter: blur(28px);
+  content: none;
 }
 
 .wrap {
@@ -102,14 +112,14 @@
   width: 48px;
   height: 48px;
   object-fit: contain;
-  border-radius: 12px;
+  border-radius: 14px;
 }
 
 .brandWordmark {
   font-family: var(--font-sans), system-ui, sans-serif;
   font-size: clamp(1.05rem, 2.4vw, 1.2rem);
   font-weight: 800;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.11em;
   line-height: 1.1;
 }
 
@@ -144,7 +154,7 @@
 }
 
 .nav a {
-  color: #9a958c;
+  color: rgba(255, 255, 255, 0.5);
   transition: color 0.2s ease;
 }
 
@@ -153,7 +163,7 @@
 }
 
 .nav a:hover {
-  color: #e6cf94;
+  color: #c5a059;
 }
 
 .pageLight .nav a:hover {
@@ -162,7 +172,7 @@
 
 .navActive {
   color: #c5a059 !important;
-  font-weight: 650;
+  font-weight: 700;
 }
 
 .content {

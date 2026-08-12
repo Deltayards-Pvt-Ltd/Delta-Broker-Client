@@ -11,12 +11,26 @@ import { NavIcon } from "@/app/component/NavIcon";
 import { useStaffPendingCount } from "@/lib/usePendingCount";
 import styles from "./Sidebar.module.css";
 
-function isActive(pathname, href) {
+function isExactActive(pathname, href) {
   return pathname === href;
 }
 
-function sectionOpen(pathname, children) {
-  return children.some(
+/** Active child: exact match, or nested under this href unless a sibling is more specific. */
+function isChildActive(pathname, childHref, siblingHrefs) {
+  if (pathname === childHref) return true;
+  if (!pathname.startsWith(`${childHref}/`)) return false;
+  return !siblingHrefs.some(
+    (h) =>
+      h !== childHref &&
+      (pathname === h || pathname.startsWith(`${h}/`))
+  );
+}
+
+function sectionOpen(pathname, item) {
+  if (item.href && (pathname === item.href || pathname.startsWith(`${item.href}/`))) {
+    return true;
+  }
+  return (item.children || []).some(
     (c) => pathname === c.href || pathname.startsWith(`${c.href}/`)
   );
 }
@@ -39,7 +53,7 @@ export default function Sidebar({ open, onClose, persistent }) {
   useEffect(() => {
     const next = {};
     for (const item of items) {
-      if (item.children && sectionOpen(pathname, item.children)) {
+      if (item.children && sectionOpen(pathname, item)) {
         next[item.id] = true;
       }
     }
@@ -116,26 +130,53 @@ export default function Sidebar({ open, onClose, persistent }) {
           {items.map((item) => {
             if (item.children?.length) {
               const openSection = Boolean(expanded[item.id]);
-              const parentActive = sectionOpen(pathname, item.children);
+              const parentActive = sectionOpen(pathname, item);
               const parentBadge = badgeFor(item);
+              const siblingHrefs = item.children.map((c) => c.href);
               return (
                 <div key={item.id} className={styles.group}>
-                  <button
-                    type="button"
-                    className={`${styles.groupBtn} ${
+                  <div
+                    className={`${styles.groupRow} ${
                       parentActive ? styles.activeParent : ""
                     } ${parentBadge > 0 ? styles.hasBadge : ""}`}
-                    onClick={() => toggleSection(item.id)}
-                    aria-expanded={openSection}
                   >
-                    <span className={styles.itemMain}>
-                      <span className={styles.iconWrap}>
-                        <NavIcon name={item.icon} />
-                      </span>
-                      {item.label}
-                    </span>
-                    <span className={styles.itemEnd}>
-                      <CountBadge count={parentBadge} />
+                    {item.href ? (
+                      <Link
+                        href={item.href}
+                        className={styles.groupLink}
+                        onClick={handleNav}
+                      >
+                        <span className={styles.itemMain}>
+                          <span className={styles.iconWrap}>
+                            <NavIcon name={item.icon} />
+                          </span>
+                          {item.label}
+                        </span>
+                        <CountBadge count={parentBadge} />
+                      </Link>
+                    ) : (
+                      <button
+                        type="button"
+                        className={styles.groupLink}
+                        onClick={() => toggleSection(item.id)}
+                        aria-expanded={openSection}
+                      >
+                        <span className={styles.itemMain}>
+                          <span className={styles.iconWrap}>
+                            <NavIcon name={item.icon} />
+                          </span>
+                          {item.label}
+                        </span>
+                        <CountBadge count={parentBadge} />
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      className={styles.chevronBtn}
+                      onClick={() => toggleSection(item.id)}
+                      aria-expanded={openSection}
+                      aria-label={`${openSection ? "Collapse" : "Expand"} ${item.label}`}
+                    >
                       <ChevronDown
                         size={16}
                         strokeWidth={1.75}
@@ -144,8 +185,8 @@ export default function Sidebar({ open, onClose, persistent }) {
                         }`}
                         aria-hidden
                       />
-                    </span>
-                  </button>
+                    </button>
+                  </div>
 
                   <div
                     className={`${styles.sub} ${
@@ -160,7 +201,11 @@ export default function Sidebar({ open, onClose, persistent }) {
                             key={child.id}
                             href={child.href}
                             className={`${styles.subLink} ${
-                              isActive(pathname, child.href)
+                              isChildActive(
+                                pathname,
+                                child.href,
+                                siblingHrefs
+                              )
                                 ? styles.activeSub
                                 : ""
                             } ${childBadge > 0 ? styles.hasBadge : ""}`}
@@ -183,7 +228,7 @@ export default function Sidebar({ open, onClose, persistent }) {
                 key={item.id}
                 href={item.href}
                 className={`${styles.link} ${
-                  isActive(pathname, item.href) ? styles.active : ""
+                  isExactActive(pathname, item.href) ? styles.active : ""
                 } ${itemBadge > 0 ? styles.hasBadge : ""}`}
                 onClick={handleNav}
               >

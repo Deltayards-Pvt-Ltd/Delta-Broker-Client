@@ -10,8 +10,8 @@ export default function NewOfferPage() {
         <div>
           <h1 className={styles.title}>New offer</h1>
           <p className={styles.sub}>
-            Offer is visible to all partners. Optionally broadcast to a targeted
-            audience (categories / brokers).
+            Active offers show for all partners. Optionally notify everyone with
+            a broadcast.
           </p>
         </div>
       </div>

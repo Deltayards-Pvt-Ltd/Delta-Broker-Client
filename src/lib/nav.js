@@ -96,9 +96,8 @@ export const NAV_ITEMS = [
   {
     id: "offers",
     label: "Offers",
-    icon: "folder",
+    icon: "gift",
     href: "/offers",
-    roles: STAFF_ROLES,
     children: [
       {
         id: "offers-all",
@@ -159,12 +158,7 @@ export const TOP_TABS = [
     roles: [ROLES.SUPER_ADMIN],
   },
   { id: "projects", label: "Projects", href: "/projects" },
-  {
-    id: "offers",
-    label: "Offers",
-    href: "/offers",
-    roles: STAFF_ROLES,
-  },
+  { id: "offers", label: "Offers", href: "/offers" },
 ];
 
 export function navForRole(items, role) {
@@ -203,12 +197,13 @@ export function canAccessPath(pathname, role) {
       pathname === "/projects/new" ||
       pathname.endsWith("/edit")
     ) {
+      // Offer edit allowed for plain admin; other */edit stays blocked
+      if (pathname.startsWith("/offers/") && pathname.endsWith("/edit")) {
+        return true;
+      }
       return false;
     }
-    if (
-      pathname === "/offers/new" ||
-      (pathname.startsWith("/offers/") && pathname.endsWith("/edit"))
-    ) {
+    if (pathname === "/offers/new") {
       return false;
     }
     if (
@@ -236,8 +231,16 @@ export function canAccessPath(pathname, role) {
   // Broker
   if (pathname === "/dashboard") return true;
   if (pathname === "/profile") return true;
+  if (pathname === "/profile/password") return true;
   if (pathname === "/updates") return true;
   if (pathname === "/projects") return true;
+
+  if (
+    pathname === "/offers/new" ||
+    (pathname.startsWith("/offers/") && pathname.endsWith("/edit"))
+  ) {
+    return false;
+  }
   if (pathname === "/offers" || pathname.startsWith("/offers/")) return true;
 
   if (

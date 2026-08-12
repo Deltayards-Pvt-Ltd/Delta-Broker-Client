@@ -10,14 +10,12 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 1.1rem 1.25rem;
-  border-radius: 20px;
+  border-radius: 22px;
   position: relative;
   overflow: hidden;
-  background: var(--glass-bg);
+  background: var(--plate);
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow-card);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
 }
 
 /* ——— greeting atmosphere (right-side ambient wash) ——— */
@@ -485,14 +483,12 @@
   gap: 0.2rem;
   min-height: 148px;
   padding: 1.1rem 1.15rem 1.15rem;
-  border-radius: 18px;
+  border-radius: 22px;
   text-decoration: none;
   color: inherit;
-  background: var(--glass-bg);
+  background: var(--plate);
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow-card);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
   transition: transform 0.15s ease, box-shadow 0.15s ease;
   min-width: 0;
 }
@@ -503,27 +499,27 @@ a.statCard:hover {
 }
 
 .cardAmber {
-  background: var(--glass-bg), var(--card-amber);
+  background: linear-gradient(180deg, var(--card-amber), var(--plate));
 }
 
 .cardEmerald {
-  background: var(--glass-bg), var(--card-emerald);
+  background: linear-gradient(180deg, var(--card-emerald), var(--plate));
 }
 
 .cardRed {
-  background: var(--glass-bg), var(--card-red);
+  background: linear-gradient(180deg, var(--card-red), var(--plate));
 }
 
 .cardBlue {
-  background: var(--glass-bg), var(--card-blue);
+  background: linear-gradient(180deg, var(--card-blue), var(--plate));
 }
 
 .cardTeal {
-  background: var(--glass-bg), var(--card-teal);
+  background: linear-gradient(180deg, var(--card-teal), var(--plate));
 }
 
 .cardSlate {
-  background: var(--glass-bg), var(--card-slate);
+  background: linear-gradient(180deg, var(--card-slate), var(--plate));
 }
 
 .statTop {
@@ -610,12 +606,10 @@ a.statCard:hover {
 
 .panel {
   padding: 1.15rem 1.25rem 1.25rem;
-  border-radius: 20px;
-  background: var(--glass-bg);
+  border-radius: 22px;
+  background: var(--plate);
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow-card);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
 }
 
 .panelHead {
