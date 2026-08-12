@@ -3,6 +3,7 @@
 import {
   BadgeCheck,
   FileText,
+  Gift,
   Home,
   Megaphone,
   PartyPopper,
@@ -18,6 +19,7 @@ const KIND_META = {
   cp_meet: { label: "CP MEET", Icon: Users },
   project: { label: "NEW PROJECT", Icon: Home },
   policy: { label: "POLICY", Icon: FileText },
+  offer: { label: "OFFER", Icon: Gift },
   system: { label: "SYSTEM", Icon: Settings },
 };
 

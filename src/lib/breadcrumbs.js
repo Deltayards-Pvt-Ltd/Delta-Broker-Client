@@ -11,6 +11,7 @@ export function breadcrumbsFromPath(pathname) {
     brokers: "Brokers",
     admins: "Admins",
     projects: "Projects",
+    offers: "Offers",
     profile: "Account",
     password: "Password",
     approved: "Approved",

@@ -94,6 +94,27 @@ export const NAV_ITEMS = [
     ],
   },
   {
+    id: "offers",
+    label: "Offers",
+    icon: "folder",
+    href: "/offers",
+    roles: STAFF_ROLES,
+    children: [
+      {
+        id: "offers-all",
+        label: "All Offers",
+        href: "/offers",
+        roles: STAFF_ROLES,
+      },
+      {
+        id: "offers-new",
+        label: "Add Offer",
+        href: "/offers/new",
+        roles: [ROLES.SUPER_ADMIN],
+      },
+    ],
+  },
+  {
     id: "profile",
     label: "Account",
     href: "/profile",
@@ -138,6 +159,12 @@ export const TOP_TABS = [
     roles: [ROLES.SUPER_ADMIN],
   },
   { id: "projects", label: "Projects", href: "/projects" },
+  {
+    id: "offers",
+    label: "Offers",
+    href: "/offers",
+    roles: STAFF_ROLES,
+  },
 ];
 
 export function navForRole(items, role) {
@@ -179,6 +206,12 @@ export function canAccessPath(pathname, role) {
       return false;
     }
     if (
+      pathname === "/offers/new" ||
+      (pathname.startsWith("/offers/") && pathname.endsWith("/edit"))
+    ) {
+      return false;
+    }
+    if (
       pathname === "/dashboard" ||
       pathname === "/profile" ||
       pathname === "/profile/password" ||
@@ -189,7 +222,9 @@ export function canAccessPath(pathname, role) {
       pathname === "/projects" ||
       pathname === "/projects/active" ||
       pathname === "/projects/closed" ||
-      pathname.startsWith("/projects/")
+      pathname.startsWith("/projects/") ||
+      pathname === "/offers" ||
+      pathname.startsWith("/offers/")
     ) {
       // Categories manage is super_admin only
       if (pathname.startsWith("/brokers/categories")) return false;
@@ -203,6 +238,7 @@ export function canAccessPath(pathname, role) {
   if (pathname === "/profile") return true;
   if (pathname === "/updates") return true;
   if (pathname === "/projects") return true;
+  if (pathname === "/offers" || pathname.startsWith("/offers/")) return true;
 
   if (
     pathname === "/projects/new" ||

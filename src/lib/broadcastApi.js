@@ -5,6 +5,7 @@ export const BROADCAST_KINDS = [
   { key: "cp_meet", label: "CP Meet" },
   { key: "project", label: "New project" },
   { key: "policy", label: "Policy" },
+  { key: "offer", label: "Offer" },
 ];
 
 export const BROADCAST_AUDIENCES = [

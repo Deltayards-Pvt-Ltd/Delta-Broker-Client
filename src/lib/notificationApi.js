@@ -58,6 +58,7 @@ export function notificationHref(n) {
   if (n?.type === "broadcast") {
     const link = n?.meta?.link;
     if (link) return link;
+    if (n?.meta?.kind === "offer") return "/offers";
     return "/dashboard";
   }
   const link = n?.meta?.link;
