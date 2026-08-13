@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Pencil, Search } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { isSuperAdminRole } from "@/lib/roles";
-import { fetchBrokers } from "@/lib/brokerApi";
+import { fetchBrokers, disableBroker, enableBroker } from "@/lib/brokerApi";
 import Pagination from "@/app/component/Pagination";
 import BrokerEditModal from "@/app/component/BrokerEditModal";
 import styles from "./brokers.module.css";
@@ -30,6 +30,14 @@ function formatPhone(phone) {
   return `+91 ${phone}`;
 }
 
+function canToggleAccess(status) {
+  return status === "approved" || status === "active" || status === "inactive";
+}
+
+function isEnabledStatus(status) {
+  return status === "approved" || status === "active";
+}
+
 export default function BrokerListPage({
   title,
   status,
@@ -49,6 +57,7 @@ export default function BrokerListPage({
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [editing, setEditing] = useState(null);
+  const [togglingId, setTogglingId] = useState(null);
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedQ(query.trim()), 300);
@@ -64,7 +73,7 @@ export default function BrokerListPage({
     setError("");
     try {
       const effectiveStatus =
-        status || (statusFilter !== "all" ? statusFilter : undefined);
+        status || (statusFilter !== "all" ? statusFilter : "all");
       const data = await fetchBrokers({
         status: effectiveStatus,
         page,
@@ -95,9 +104,55 @@ export default function BrokerListPage({
       load();
       return;
     }
-    setBrokers((prev) =>
-      prev.map((b) => (b._id === updated._id ? { ...b, ...updated } : b))
+    applyBrokerUpdate(updated, { mergeAll: true });
+  };
+
+  const applyBrokerUpdate = (updated, { mergeAll = false } = {}) => {
+    const nextStatus = updated.status;
+    const pageStatus = status || (statusFilter !== "all" ? statusFilter : null);
+    const stillMatches =
+      !pageStatus ||
+      nextStatus === pageStatus ||
+      (pageStatus === "approved" &&
+        (nextStatus === "approved" || nextStatus === "active"));
+
+    setBrokers((prev) => {
+      if (!stillMatches) return prev.filter((b) => b._id !== updated._id);
+      return prev.map((b) =>
+        b._id === updated._id
+          ? mergeAll
+            ? { ...b, ...updated }
+            : { ...b, status: nextStatus }
+          : b
+      );
+    });
+    if (!stillMatches) {
+      setTotal((t) => Math.max(0, t - 1));
+    }
+  };
+
+  const onToggleAccess = async (broker) => {
+    if (!canToggleAccess(broker.status) || togglingId) return;
+    const enabling = broker.status === "inactive";
+    const ok = window.confirm(
+      enabling
+        ? `Enable ${broker.name || "this broker"}? They will be able to log in and receive notifications again.`
+        : `Disable ${broker.name || "this broker"}? They will not be able to log in or receive notifications.`
     );
+    if (!ok) return;
+
+    setTogglingId(broker._id);
+    setError("");
+    try {
+      const data = enabling
+        ? await enableBroker(broker._id)
+        : await disableBroker(broker._id);
+      if (data.broker) applyBrokerUpdate(data.broker);
+    } catch (err) {
+      setError(err.message || "Failed to update broker access");
+    } finally {
+      setTogglingId(null);
+    }
   };
 
   return (
@@ -155,6 +210,7 @@ export default function BrokerListPage({
                   <th>Member since</th>
                   <th>Valid till</th>
                   <th>Status</th>
+                  {canEdit ? <th>Access</th> : null}
                   {canEdit ? <th>Actions</th> : null}
                 </tr>
               </thead>
@@ -188,9 +244,38 @@ export default function BrokerListPage({
                         <span
                           className={`${styles.badge} ${styles[b.status] || ""}`}
                         >
-                          {b.status}
+                          {b.status === "inactive" ? "disabled" : b.status}
                         </span>
                       </td>
+                      {canEdit ? (
+                        <td>
+                          {canToggleAccess(b.status) ? (
+                            <button
+                              type="button"
+                              className={`${styles.switch} ${
+                                isEnabledStatus(b.status) ? styles.switchOn : ""
+                              }`}
+                              onClick={() => onToggleAccess(b)}
+                              disabled={Boolean(togglingId)}
+                              aria-pressed={isEnabledStatus(b.status)}
+                              aria-label={
+                                isEnabledStatus(b.status)
+                                  ? `Disable ${b.name || "broker"}`
+                                  : `Enable ${b.name || "broker"}`
+                              }
+                              title={
+                                isEnabledStatus(b.status)
+                                  ? "Disable — no login, no notifications"
+                                  : "Enable — restore login and notifications"
+                              }
+                            >
+                              <span className={styles.switchKnob} />
+                            </button>
+                          ) : (
+                            <span className={styles.muted}>—</span>
+                          )}
+                        </td>
+                      ) : null}
                       {canEdit ? (
                         <td>
                           <button

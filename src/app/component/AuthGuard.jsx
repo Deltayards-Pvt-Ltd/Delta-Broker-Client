@@ -3,12 +3,12 @@
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { isBrokerPending } from "@/lib/auth";
+import { API_URL, getToken, isBrokerPending } from "@/lib/auth";
 
 export default function AuthGuard({ children }) {
   const router = useRouter();
   const pathname = usePathname();
-  const { isAuthenticated, loading, user } = useAuth();
+  const { isAuthenticated, loading, user, logout } = useAuth();
 
   useEffect(() => {
     if (loading) return;
@@ -20,6 +20,38 @@ export default function AuthGuard({ children }) {
       router.replace("/pending");
     }
   }, [loading, isAuthenticated, user, pathname, router]);
+
+  useEffect(() => {
+    if (loading || !isAuthenticated) return;
+    const token = getToken();
+    if (!token) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/notifications/unread-count`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (cancelled || res.status !== 401) return;
+        const data = await res.json().catch(() => ({}));
+        if (
+          data.code === "ACCOUNT_DISABLED" ||
+          data.code === "SESSION_REVOKED"
+        ) {
+          await logout();
+          router.replace("/login");
+        }
+      } catch {
+        // network blip — don't kick
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // logout identity is unstable; only re-check when the session user changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, isAuthenticated, user?.id, router]);
 
   if (loading) {
     return (

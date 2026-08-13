@@ -64,4 +64,20 @@ export async function updateBroker(id, payload) {
   });
   return parse(res);
 }
+
+export async function disableBroker(id) {
+  const res = await fetch(`${API_URL}/api/brokers/${id}/disable`, {
+    method: "POST",
+    headers: authHeaders(),
+  });
+  return parse(res);
+}
+
+export async function enableBroker(id) {
+  const res = await fetch(`${API_URL}/api/brokers/${id}/enable`, {
+    method: "POST",
+    headers: authHeaders(),
+  });
+  return parse(res);
+}
  
