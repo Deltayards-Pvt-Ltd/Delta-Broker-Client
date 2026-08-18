@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
@@ -37,11 +38,21 @@ export default function LandingPage() {
       <div className={styles.wrap}>
         <header className={`${styles.header} ${styles.reveal}`}>
           <Link href="/" className={styles.brand}>
-            <span className={styles.brandWordmark}>
-              <span className={styles.brandDelta}>DELTA</span>{" "}
-              <span className={styles.brandYards}>YARDS</span>
+            <Image
+              src="/new_logo.png"
+              alt="Delta Yards"
+              width={48}
+              height={48}
+              className={styles.brandMark}
+              priority
+            />
+            <span className={styles.brandText}>
+              <span className={styles.brandWordmark}>
+                <span className={styles.brandDelta}>DELTA</span>{" "}
+                <span className={styles.brandYards}>YARDS</span>
+              </span>
+              <span className={styles.brandTag}>Channel Partner Platform</span>
             </span>
-            <span className={styles.brandTag}>Channel Partner Platform</span>
           </Link>
           <nav className={styles.nav}>
             <Link href="/login" className={styles.navPrimary}>
