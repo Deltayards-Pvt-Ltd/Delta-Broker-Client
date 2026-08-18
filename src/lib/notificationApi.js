@@ -56,9 +56,9 @@ export function notificationHref(n) {
   if (n?.type === "approvalRequired") return "/approvals";
   if (n?.type === "welcome" || n?.type === "approved") return "/projects";
   if (n?.type === "broadcast") {
+    if (n?.meta?.kind === "offer") return null;
     const link = n?.meta?.link;
     if (link) return link;
-    if (n?.meta?.kind === "offer") return "/offers";
     return "/dashboard";
   }
   const link = n?.meta?.link;

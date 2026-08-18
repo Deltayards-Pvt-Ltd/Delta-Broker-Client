@@ -7,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { isBrokerRole, isStaffRole, isSuperAdminRole } from "@/lib/roles";
 import { deleteOffer, fetchOffers } from "@/lib/offerApi";
 import { offerBadge } from "@/lib/offerBadge";
+import OfferDetailModal from "@/app/component/OfferDetailModal";
 import styles from "./offers.module.css";
 
 const SCOPE_TABS = [
@@ -45,7 +46,7 @@ export default function OffersPage() {
   const { user } = useAuth();
   const canCreate = isSuperAdminRole(user?.role);
   const canDelete = isSuperAdminRole(user?.role);
-  const canEdit = isStaffRole(user?.role);
+  const canEdit = isSuperAdminRole(user?.role);
   const isStaff = isStaffRole(user?.role);
   const isBroker = isBrokerRole(user?.role);
 
@@ -111,7 +112,7 @@ export default function OffersPage() {
           <p className={styles.sub}>
             {isBroker
               ? "Schemes and incentives from Delta Yards."
-              : "Past end date auto-deactivates for partners. Staff can extend dates and re-activate anytime."}
+              : "Past end date auto-deactivates for partners. Super admin can extend dates and re-activate anytime."}
           </p>
         </div>
         {canCreate ? (
@@ -232,15 +233,17 @@ export default function OffersPage() {
                     ) : null}
                   </div>
                 </div>
-                {canEdit ? (
+                {canEdit || canDelete ? (
                   <div className={styles.actions}>
-                    <Link
-                      href={`/offers/${o._id}/edit`}
-                      className={`${styles.btn} ${styles.btnGhost}`}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <Pencil size={14} /> Edit
-                    </Link>
+                    {canEdit ? (
+                      <Link
+                        href={`/offers/${o._id}/edit`}
+                        className={`${styles.btn} ${styles.btnGhost}`}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Pencil size={14} /> Edit
+                      </Link>
+                    ) : null}
                     {canDelete ? (
                       <button
                         type="button"
@@ -261,100 +264,11 @@ export default function OffersPage() {
         </div>
       )}
 
-      {selected ? (
-        <div
-          className={styles.detailOverlay}
-          role="presentation"
-          onClick={() => setSelected(null)}
-        >
-          <div
-            className={styles.detailSheet}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="offer-detail-title"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {selected.bannerImage ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={selected.bannerImage}
-                alt=""
-                className={styles.detailHero}
-              />
-            ) : null}
-            <div className={styles.detailBody}>
-              <p className={styles.detailEyebrow}>
-                {selected.project?.name
-                  ? `Project · ${selected.project.name}`
-                  : "Global offer"}
-              </p>
-              <h2 id="offer-detail-title" className={styles.detailTitle}>
-                {selected.title}
-              </h2>
-              {formatRange(selected.startsAt, selected.endsAt) ? (
-                <p className={styles.hint}>
-                  {formatRange(selected.startsAt, selected.endsAt)}
-                </p>
-              ) : null}
-              <div className={styles.badges}>
-                {isStaff ? (
-                  <>
-                    <span
-                      className={`${styles.badge} ${
-                        selected.active ? styles.badgeOn : styles.badgeOff
-                      }`}
-                    >
-                      {selected.active ? "Active" : "Inactive"}
-                    </span>
-                    {selected.expired ? (
-                      <span className={`${styles.badge} ${styles.badgeExpire}`}>
-                        Expired
-                      </span>
-                    ) : null}
-                  </>
-                ) : null}
-                {(() => {
-                  const b = offerBadge(selected.startsAt, selected.endsAt);
-                  if (!b) return null;
-                  return (
-                    <span
-                      className={`${styles.badge} ${
-                        b.kind === "start"
-                          ? styles.badgeStart
-                          : styles.badgeExpire
-                      }`}
-                    >
-                      {b.label}
-                    </span>
-                  );
-                })()}
-              </div>
-              {selected.description ? (
-                <p className={styles.detailCopy}>{selected.description}</p>
-              ) : (
-                <p className={styles.hint}>No description.</p>
-              )}
-              <div className={styles.detailActions}>
-                {canEdit ? (
-                  <Link
-                    href={`/offers/${selected._id}/edit`}
-                    className={styles.btn}
-                  >
-                    Edit offer
-                  </Link>
-                ) : null}
-                <button
-                  type="button"
-                  className={`${styles.btn} ${styles.btnGhost}`}
-                  onClick={() => setSelected(null)}
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      <OfferDetailModal
+        open={Boolean(selected)}
+        offer={selected}
+        onClose={() => setSelected(null)}
+      />
     </div>
   );
 }

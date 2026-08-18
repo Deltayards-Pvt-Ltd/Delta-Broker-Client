@@ -17,8 +17,11 @@ import FeedCard, {
   metaFromUpdate,
 } from "@/app/component/FeedCard";
 import UpdateDetailModal from "@/app/component/UpdateDetailModal";
+import OfferDetailModal from "@/app/component/OfferDetailModal";
 import SendBroadcastModal from "@/app/component/SendBroadcastModal";
 import Pagination from "@/app/component/Pagination";
+import { isOfferFeedItem } from "@/lib/offerApi";
+import { useOfferPreview } from "@/lib/useOfferPreview";
 import styles from "./broadcast.module.css";
 
 const PAGE_SIZE = 10;
@@ -51,6 +54,7 @@ export default function BroadcastPage() {
 
   const [error, setError] = useState("");
   const [ok, setOk] = useState("");
+  const offerPreview = useOfferPreview();
 
   const loadBroadcasts = useCallback(async () => {
     setBLoading(true);
@@ -122,8 +126,16 @@ export default function BroadcastPage() {
     if (bPage === 1) loadBroadcasts();
   };
 
+  const onOpenBroadcast = async (b) => {
+    if (isOfferFeedItem(b)) {
+      setSelectedBroadcast(null);
+      await offerPreview.openFromFeed(b);
+      return;
+    }
+    setSelectedBroadcast(b);
+  };
+
   const onOpenUpdate = async (n) => {
-    setSelectedUpdate(n);
     if (!n.read) {
       try {
         await markNotificationRead(n._id);
@@ -135,6 +147,12 @@ export default function BroadcastPage() {
         /* ignore */
       }
     }
+    if (isOfferFeedItem(n)) {
+      setSelectedUpdate(null);
+      await offerPreview.openFromFeed(n);
+      return;
+    }
+    setSelectedUpdate(n);
   };
 
   const onMarkAll = async () => {
@@ -258,7 +276,7 @@ export default function BroadcastPage() {
                       message={`${b.audienceLabel || "All brokers"} · ${b.recipientCount ?? 0} recipients — ${b.message}`}
                       createdAt={b.createdAt}
                       link={meta.link}
-                      onClick={() => setSelectedBroadcast(b)}
+                      onClick={() => onOpenBroadcast(b)}
                       onDelete={canCompose ? () => onDelete(b._id) : undefined}
                     />
                   </li>
@@ -368,6 +386,14 @@ export default function BroadcastPage() {
             </button>
           ) : null
         }
+      />
+
+      <OfferDetailModal
+        open={offerPreview.open}
+        offer={offerPreview.offer}
+        loading={offerPreview.loading}
+        error={offerPreview.error}
+        onClose={offerPreview.close}
       />
     </div>
   );

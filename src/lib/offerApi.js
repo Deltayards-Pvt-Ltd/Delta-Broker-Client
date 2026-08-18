@@ -59,3 +59,33 @@ export async function deleteOffer(id) {
   });
   return parse(res);
 }
+
+export function offerIdFromFeed(item) {
+  return item?.offerId || item?.meta?.offerId || null;
+}
+
+export function isOfferFeedItem(item) {
+  return (
+    item?.kind === "offer" ||
+    item?.meta?.kind === "offer" ||
+    Boolean(offerIdFromFeed(item))
+  );
+}
+
+/** Load the Offer doc from an inbox/outbox row. No navigation. */
+export async function resolveOfferFromFeed(item) {
+  const id = offerIdFromFeed(item);
+  if (id) {
+    const data = await fetchOffer(id);
+    return data.offer || null;
+  }
+  if (!isOfferFeedItem(item)) return null;
+  const title = String(item?.title || "").trim().toLowerCase();
+  if (!title) return null;
+  const data = await fetchOffers({ page: 1, limit: 50 });
+  return (
+    (data.offers || []).find(
+      (o) => String(o.title || "").trim().toLowerCase() === title
+    ) || null
+  );
+}

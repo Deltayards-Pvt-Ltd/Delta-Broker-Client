@@ -11,7 +11,10 @@ import {
 } from "@/lib/notificationApi";
 import FeedCard, { metaFromUpdate } from "@/app/component/FeedCard";
 import UpdateDetailModal from "@/app/component/UpdateDetailModal";
+import OfferDetailModal from "@/app/component/OfferDetailModal";
 import Pagination from "@/app/component/Pagination";
+import { isOfferFeedItem } from "@/lib/offerApi";
+import { useOfferPreview } from "@/lib/useOfferPreview";
 import styles from "./updates.module.css";
 
 const PAGE_SIZE = 10;
@@ -27,6 +30,7 @@ export default function UpdatesPage() {
   const [error, setError] = useState("");
   const [unreadCount, setUnreadCount] = useState(0);
   const [selected, setSelected] = useState(null);
+  const offerPreview = useOfferPreview();
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -50,7 +54,6 @@ export default function UpdatesPage() {
   }, [load]);
 
   const onOpen = async (n) => {
-    setSelected(n);
     if (!n.read) {
       try {
         await markNotificationRead(n._id);
@@ -62,6 +65,12 @@ export default function UpdatesPage() {
         /* ignore */
       }
     }
+    if (isOfferFeedItem(n)) {
+      setSelected(null);
+      await offerPreview.openFromFeed(n);
+      return;
+    }
+    setSelected(n);
   };
 
   const onMarkAll = async () => {
@@ -186,6 +195,14 @@ export default function UpdatesPage() {
             </button>
           ) : null
         }
+      />
+
+      <OfferDetailModal
+        open={offerPreview.open}
+        offer={offerPreview.offer}
+        loading={offerPreview.loading}
+        error={offerPreview.error}
+        onClose={offerPreview.close}
       />
     </div>
   );

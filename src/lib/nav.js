@@ -197,10 +197,6 @@ export function canAccessPath(pathname, role) {
       pathname === "/projects/new" ||
       pathname.endsWith("/edit")
     ) {
-      // Offer edit allowed for plain admin; other */edit stays blocked
-      if (pathname.startsWith("/offers/") && pathname.endsWith("/edit")) {
-        return true;
-      }
       return false;
     }
     if (pathname === "/offers/new") {

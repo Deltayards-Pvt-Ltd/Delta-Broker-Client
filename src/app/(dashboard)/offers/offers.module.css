@@ -344,8 +344,7 @@
 }
 
 .field input,
-.field textarea,
-.field select {
+.field textarea {
   width: 100%;
   box-sizing: border-box;
   border: 1px solid var(--line);
@@ -354,9 +353,8 @@
   font: inherit;
   font-size: 0.95rem;
   outline: none;
-  color-scheme: dark;
   color: var(--ink);
-  background: var(--surface-muted, rgba(22, 24, 34, 0.92));
+  background: var(--surface-muted);
   transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 }
 
@@ -367,29 +365,21 @@
 }
 
 .field input:hover,
-.field textarea:hover,
-.field select:hover {
+.field textarea:hover {
   border-color: var(--line-hover);
 }
 
 .field input:focus,
-.field textarea:focus,
-.field select:focus {
+.field textarea:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 3px var(--primary-focus, rgba(197, 160, 89, 0.22));
   background: var(--surface);
 }
 
 .field input:disabled,
-.field textarea:disabled,
-.field select:disabled {
+.field textarea:disabled {
   opacity: 0.6;
   cursor: not-allowed;
-}
-
-.field select option {
-  background: #12141c;
-  color: var(--ink);
 }
 
 .field textarea {
@@ -651,11 +641,65 @@
   text-align: left;
   cursor: pointer;
   color: var(--ink);
-  background: var(--surface-muted, rgba(22, 24, 34, 0.92));
+  background: var(--surface-muted);
 }
 
-.dropdownTrigger:hover {
+.dropdownTrigger:hover:not(:disabled) {
   border-color: var(--line-hover);
+}
+
+.dropdownTrigger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.projectSelect {
+  position: relative;
+}
+
+.selectMenu {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0.35rem;
+  max-height: 240px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+}
+
+.selectItem {
+  display: block;
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.92rem;
+}
+
+.selectItem:hover {
+  background: var(--surface-muted);
+}
+
+.selectItemOn {
+  background: var(--primary-soft);
+  color: var(--ink);
+  font-weight: 650;
 }
 
 .dropdownTrigger span {

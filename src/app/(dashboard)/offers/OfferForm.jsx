@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { CalendarDays, ImagePlus, Upload, X } from "lucide-react";
+import { CalendarDays, ChevronDown, ImagePlus, Upload, X } from "lucide-react";
 import { createOffer, updateOffer } from "@/lib/offerApi";
 import { fetchProjects } from "@/lib/projectApi";
 import { uploadOfferFilesToS3 } from "@/lib/s3Upload";
@@ -92,6 +92,91 @@ function DateField({ id, label, value, onChange, min, disabled }) {
   );
 }
 
+function ProjectSelect({ id, value, projects, onChange, disabled }) {
+  const wrapRef = useRef(null);
+  const [open, setOpen] = useState(false);
+  const selected = projects.find((p) => String(p._id) === String(value));
+  const label = selected?.name || "Global";
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e) => {
+      if (!wrapRef.current?.contains(e.target)) setOpen(false);
+    };
+    const onKey = (e) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  const pick = (next) => {
+    onChange(next);
+    setOpen(false);
+  };
+
+  return (
+    <div className={styles.projectSelect} ref={wrapRef}>
+      <button
+        type="button"
+        id={id}
+        className={styles.dropdownTrigger}
+        onClick={() => !disabled && setOpen((v) => !v)}
+        disabled={disabled}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        <span>{label}</span>
+        <ChevronDown
+          size={16}
+          className={`${styles.dropdownChevron} ${
+            open ? styles.dropdownChevronOpen : ""
+          }`}
+        />
+      </button>
+      {open ? (
+        <ul className={styles.selectMenu} role="listbox">
+          <li>
+            <button
+              type="button"
+              role="option"
+              aria-selected={!value}
+              className={`${styles.selectItem} ${
+                !value ? styles.selectItemOn : ""
+              }`}
+              onClick={() => pick("")}
+            >
+              Global
+            </button>
+          </li>
+          {projects.map((p) => {
+            const on = String(p._id) === String(value);
+            return (
+              <li key={p._id}>
+                <button
+                  type="button"
+                  role="option"
+                  aria-selected={on}
+                  className={`${styles.selectItem} ${
+                    on ? styles.selectItemOn : ""
+                  }`}
+                  onClick={() => pick(p._id)}
+                >
+                  {p.name}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
+    </div>
+  );
+}
+
 export default function OfferForm({ mode = "create", initial = null }) {
   const router = useRouter();
   const imageInputRef = useRef(null);
@@ -103,6 +188,7 @@ export default function OfferForm({ mode = "create", initial = null }) {
   const [active, setActive] = useState(initial?.active !== false);
   const [startsAt, setStartsAt] = useState(toInputDate(initial?.startsAt));
   const [endsAt, setEndsAt] = useState(toInputDate(initial?.endsAt));
+  const isEdit = mode === "edit";
   const [sendBroadcast, setSendBroadcast] = useState(false);
   const [projects, setProjects] = useState([]);
   const [busy, setBusy] = useState(false);
@@ -133,11 +219,9 @@ export default function OfferForm({ mode = "create", initial = null }) {
       : existingImageUrl || null;
 
   const submitLabel = useMemo(() => {
-    if (mode === "edit") {
-      return sendBroadcast ? "Save & notify all" : "Save offer";
-    }
+    if (isEdit) return "Save offer";
     return sendBroadcast ? "Create & notify all" : "Create offer";
-  }, [mode, sendBroadcast]);
+  }, [isEdit, sendBroadcast]);
 
   const onPickImage = (e) => {
     const file = e.target.files?.[0];
@@ -206,11 +290,13 @@ export default function OfferForm({ mode = "create", initial = null }) {
         active,
         startsAt: startsAt || null,
         endsAt: endsAt || null,
-        sendBroadcast,
-        ...(sendBroadcast ? { audience: "all" } : {}),
       };
+      if (!isEdit) {
+        payload.sendBroadcast = sendBroadcast;
+        if (sendBroadcast) payload.audience = "all";
+      }
 
-      if (mode === "edit" && initial?._id) {
+      if (isEdit && initial?._id) {
         await updateOffer(initial._id, payload);
       } else {
         await createOffer(payload);
@@ -300,24 +386,19 @@ export default function OfferForm({ mode = "create", initial = null }) {
       </section>
 
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Placement & schedule</h2>
+        <h2 className={styles.sectionTitle}>Project & schedule</h2>
 
         <div className={styles.field}>
-          <label htmlFor="offer-placement">Placement</label>
-          <select
-            id="offer-placement"
+          <label htmlFor="offer-project">Project</label>
+          <ProjectSelect
+            id="offer-project"
             value={projectId}
-            onChange={(e) => setProjectId(e.target.value)}
-          >
-            <option value="">Global</option>
-            {projects.map((p) => (
-              <option key={p._id} value={p._id}>
-                {p.name}
-              </option>
-            ))}
-          </select>
+            projects={projects}
+            onChange={setProjectId}
+            disabled={busy}
+          />
           <p className={styles.hint}>
-            Global = Offers home. Project = also under that project.
+            Global = Offers home. Pick a project to also show it there.
           </p>
         </div>
 
@@ -361,25 +442,27 @@ export default function OfferForm({ mode = "create", initial = null }) {
         </p>
       </section>
 
-      <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Broadcast (optional)</h2>
+      {!isEdit ? (
+        <section className={styles.section}>
+          <h2 className={styles.sectionTitle}>Broadcast (optional)</h2>
 
-        <div className={styles.notifyPanel}>
-          <label className={styles.checkRow}>
-            <input
-              type="checkbox"
-              checked={sendBroadcast}
-              onChange={(e) => setSendBroadcast(e.target.checked)}
-            />
-            Send notification to all partners
-          </label>
-          <p className={styles.hint}>
-            {sendBroadcast
-              ? "Inbox + push go to every approved / active partner."
-              : "Unchecked — create/save only, no notifications."}
-          </p>
-        </div>
-      </section>
+          <div className={styles.notifyPanel}>
+            <label className={styles.checkRow}>
+              <input
+                type="checkbox"
+                checked={sendBroadcast}
+                onChange={(e) => setSendBroadcast(e.target.checked)}
+              />
+              Send notification to all partners
+            </label>
+            <p className={styles.hint}>
+              {sendBroadcast
+                ? "Inbox + push go to every approved / active partner."
+                : "Unchecked — create only, no notifications."}
+            </p>
+          </div>
+        </section>
+      ) : null}
 
       {error ? <p className={styles.error}>{error}</p> : null}
 

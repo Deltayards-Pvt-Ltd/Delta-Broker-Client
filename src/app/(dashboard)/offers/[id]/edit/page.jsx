@@ -1,26 +1,39 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
+import { isSuperAdminRole } from "@/lib/roles";
 import { fetchOffer } from "@/lib/offerApi";
 import OfferForm from "../../OfferForm";
 import styles from "../../offers.module.css";
 
 export default function EditOfferPage() {
   const params = useParams();
+  const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
+  const canWrite = isSuperAdminRole(user?.role);
   const id = params?.id;
   const [offer, setOffer] = useState(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!id) return;
+    if (!authLoading && !canWrite) router.replace("/offers");
+  }, [authLoading, canWrite, router]);
+
+  useEffect(() => {
+    if (!id || !canWrite) return;
     setLoading(true);
     fetchOffer(id)
       .then((d) => setOffer(d.offer))
       .catch((err) => setError(err.message || "Failed to load"))
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, canWrite]);
+
+  if (authLoading || !canWrite) {
+    return <p className={styles.hint}>Loading…</p>;
+  }
 
   return (
     <div className={styles.page}>

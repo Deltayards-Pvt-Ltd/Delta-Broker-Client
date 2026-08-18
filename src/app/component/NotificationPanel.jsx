@@ -19,6 +19,9 @@ import {
   markNotificationRead,
   notificationHref,
 } from "@/lib/notificationApi";
+import { isOfferFeedItem } from "@/lib/offerApi";
+import { useOfferPreview } from "@/lib/useOfferPreview";
+import OfferDetailModal from "@/app/component/OfferDetailModal";
 import styles from "./NotificationPanel.module.css";
 
 const PAGE_SIZE = 10;
@@ -50,6 +53,7 @@ export default function NotificationPanel() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState(false);
+  const offerPreview = useOfferPreview();
 
   const loadUnread = useCallback(async () => {
     try {
@@ -126,6 +130,11 @@ export default function NotificationPanel() {
       } catch {
         /* ignore */
       }
+    }
+    if (isOfferFeedItem(n)) {
+      setOpen(false);
+      await offerPreview.openFromFeed(n);
+      return;
     }
     const href = notificationHref(n);
     setOpen(false);
@@ -283,6 +292,14 @@ export default function NotificationPanel() {
           </div>
         </div>
       ) : null}
+
+      <OfferDetailModal
+        open={offerPreview.open}
+        offer={offerPreview.offer}
+        loading={offerPreview.loading}
+        error={offerPreview.error}
+        onClose={offerPreview.close}
+      />
     </>
   );
 }

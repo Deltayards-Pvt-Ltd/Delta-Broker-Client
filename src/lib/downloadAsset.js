@@ -57,6 +57,13 @@ export async function downloadAssetFile(assetUrl, filename) {
   triggerBlobDownload(blob, filename);
 }
 
+export async function downloadNamedImage(url, name, fallback = "image") {
+  if (!url) return;
+  const title = safeFilename(name, fallback);
+  const ext = guessExt(url, "jpg");
+  await downloadAssetFile(url, `${title}.${ext}`);
+}
+
 export async function downloadLayoutImage(projectName, layout) {
   const src = layout?.image || layout?.images?.[0];
   if (!src) return;
