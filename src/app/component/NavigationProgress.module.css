@@ -1,0 +1,59 @@
+.bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10000;
+  width: 100%;
+  height: 3px;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  width: 38%;
+  background: linear-gradient(90deg, #b08d45, #e8d5a3, #c5a059);
+  box-shadow: 0 0 12px rgba(197, 160, 89, 0.7);
+  animation: barRun 1.05s ease-in-out infinite;
+}
+
+@keyframes barRun {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(380%);
+  }
+}
+
+.veil {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: grid;
+  place-items: center;
+  background: rgba(10, 10, 12, 0.28);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid rgba(197, 160, 89, 0.22);
+  border-top-color: #c5a059;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.fallback {
+  display: grid;
+  place-items: center;
+  min-height: 42vh;
+}

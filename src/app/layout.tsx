@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fira_Sans } from "next/font/google";
 import { AuthProvider } from "@/context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
+import NavigationProgress from "@/app/component/NavigationProgress";
 import "./globals.css";
 
 const firaSans = Fira_Sans({
@@ -25,7 +26,10 @@ export default function RootLayout({
     <html lang="en" className={firaSans.variable}>
       <body>
         <ThemeProvider>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <NavigationProgress />
+            {children}
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

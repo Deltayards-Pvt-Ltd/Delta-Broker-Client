@@ -9,12 +9,14 @@ import {
   ArrowUpRight,
   Moon,
   Sun,
+  Users,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
-import { isStaffRole, isSuperAdminRole } from "@/lib/roles";
+import { isBrokerRole, isStaffRole, isSuperAdminRole } from "@/lib/roles";
 import MembershipCard from "@/app/component/MembershipCard";
 import { fetchDashboardSummary } from "@/lib/dashboardApi";
+import { fetchLeadCountForChannelPartner } from "@/lib/leadApi";
 import {
   publishPendingFromSummary,
   useStaffPendingCount,
@@ -61,6 +63,7 @@ export default function HomePage() {
   const { user } = useAuth();
   const { isLight, toggleTheme } = useTheme();
   const isAdmin = isStaffRole(user?.role);
+  const isBroker = isBrokerRole(user?.role);
   const isSuper = isSuperAdminRole(user?.role);
   const pendingBadge = useStaffPendingCount(user, { fetchOnMount: false });
   const firstName = user?.name || (isAdmin ? "Admin" : "there");
@@ -72,12 +75,31 @@ export default function HomePage() {
     projects: 0,
   });
   const [recentProjects, setRecentProjects] = useState([]);
+  const [leadsCount, setLeadsCount] = useState(0);
 
   useEffect(() => {
-    if (!isAdmin) {
-      setLoading(false);
-      return;
-    }
+    if (!isBroker) return;
+
+    let alive = true;
+    (async () => {
+      setLoading(true);
+      try {
+        const data = await fetchLeadCountForChannelPartner();
+        if (!alive) return;
+        setLeadsCount(data.leadsCount ?? data.count ?? 0);
+      } catch {
+        if (alive) setLeadsCount(0);
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [isBroker]);
+
+  useEffect(() => {
+    if (!isAdmin) return;
 
     let alive = true;
     (async () => {
@@ -201,17 +223,30 @@ export default function HomePage() {
           </div>
         </>
       ) : (
-        <MembershipCard
-          membershipId={user?.membershipId}
-          name={user?.name}
-          partnerType={user?.partnerType}
-          firmName={user?.firmName}
-          validFrom={user?.membershipValidFrom}
-          validTill={user?.membershipValidTill}
-          phone={user?.phone}
-          maharera={user?.maharera}
-          status={user?.status}
-        />
+        <>
+          <MembershipCard
+            membershipId={user?.membershipId}
+            name={user?.name}
+            partnerType={user?.partnerType}
+            firmName={user?.firmName}
+            validFrom={user?.membershipValidFrom}
+            validTill={user?.membershipValidTill}
+            phone={user?.phone}
+            maharera={user?.maharera}
+            status={user?.status}
+          />
+          <div className={`${styles.stats} ${styles.statsSingle}`}>
+            <StatCard
+              href="/leads"
+              icon={Users}
+              label="Leads"
+              value={n(leadsCount)}
+              hint="Clients you referred"
+              tone="toneOk"
+              card="cardEmerald"
+            />
+          </div>
+        </>
       )}
 
       <section className={styles.panel}>
@@ -256,6 +291,10 @@ export default function HomePage() {
             </>
           ) : (
             <>
+              <Link href="/leads" className={styles.quickCard}>
+                <strong>Leads</strong>
+                <span>Clients you referred to Delta Yards</span>
+              </Link>
               <Link href="/offers" className={styles.quickCard}>
                 <strong>Offers</strong>
                 <span>Partner schemes & incentives</span>

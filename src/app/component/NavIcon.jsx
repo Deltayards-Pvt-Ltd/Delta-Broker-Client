@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   Bell,
   Gift,
+  ContactRound,
 } from "lucide-react";
 
 const ICONS = {
@@ -16,6 +17,7 @@ const ICONS = {
   dashboard: LayoutDashboard,
   bell: Bell,
   gift: Gift,
+  contact: ContactRound,
 };
 
 export function NavIcon({ name, size = 18 }) {

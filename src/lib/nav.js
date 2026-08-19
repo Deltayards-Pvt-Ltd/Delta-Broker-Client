@@ -37,6 +37,13 @@ export const NAV_ITEMS = [
     roles: [ROLES.BROKER],
   },
   {
+    id: "leads",
+    label: "Leads",
+    href: "/leads",
+    icon: "contact",
+    roles: [ROLES.BROKER],
+  },
+  {
     id: "brokers",
     label: "Brokers",
     icon: "users",
@@ -146,6 +153,12 @@ export const TOP_TABS = [
     roles: [ROLES.BROKER],
   },
   {
+    id: "leads",
+    label: "Leads",
+    href: "/leads",
+    roles: [ROLES.BROKER],
+  },
+  {
     id: "brokers",
     label: "Brokers",
     href: "/brokers",
@@ -230,6 +243,7 @@ export function canAccessPath(pathname, role) {
   if (pathname === "/profile/password") return true;
   if (pathname === "/updates") return true;
   if (pathname === "/projects") return true;
+  if (pathname === "/leads" || pathname.startsWith("/leads/")) return true;
 
   if (
     pathname === "/offers/new" ||
