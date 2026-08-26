@@ -20,7 +20,6 @@ export const NAV_ITEMS = [
     label: "Analytics",
     href: "/analytics",
     icon: "chart",
-    roles: STAFF_ROLES,
   },
   {
     id: "approvals",
@@ -145,7 +144,6 @@ export const TOP_TABS = [
     id: "analytics",
     label: "Analytics",
     href: "/analytics",
-    roles: STAFF_ROLES,
   },
   {
     id: "approvals",
@@ -256,6 +254,7 @@ export function canAccessPath(pathname, role) {
   if (pathname === "/dashboard") return true;
   if (pathname === "/profile") return true;
   if (pathname === "/profile/password") return true;
+  if (pathname === "/analytics" || pathname.startsWith("/analytics/")) return true;
   if (pathname === "/updates") return true;
   if (pathname === "/projects") return true;
   if (pathname === "/leads" || pathname.startsWith("/leads/")) return true;
