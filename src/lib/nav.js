@@ -16,6 +16,13 @@ export const NAV_ITEMS = [
     icon: "home",
   },
   {
+    id: "analytics",
+    label: "Analytics",
+    href: "/analytics",
+    icon: "chart",
+    roles: STAFF_ROLES,
+  },
+  {
     id: "approvals",
     label: "Approvals",
     href: "/approvals",
@@ -135,6 +142,12 @@ export const TOP_TABS = [
     href: "/dashboard",
   },
   {
+    id: "analytics",
+    label: "Analytics",
+    href: "/analytics",
+    roles: STAFF_ROLES,
+  },
+  {
     id: "approvals",
     label: "Approvals",
     href: "/approvals",
@@ -222,6 +235,8 @@ export function canAccessPath(pathname, role) {
       pathname === "/password-reset" ||
       pathname === "/password-reset/change" ||
       pathname === "/broadcast" ||
+      pathname === "/analytics" ||
+      pathname.startsWith("/analytics/") ||
       pathname.startsWith("/brokers") ||
       pathname === "/projects" ||
       pathname === "/projects/active" ||

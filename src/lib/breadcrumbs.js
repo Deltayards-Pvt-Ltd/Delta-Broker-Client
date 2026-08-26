@@ -4,6 +4,7 @@ export function breadcrumbsFromPath(pathname) {
   }
 
   const map = {
+    analytics: "Analytics",
     approvals: "Approvals",
     broadcast: "Broadcast",
     updates: "Updates",

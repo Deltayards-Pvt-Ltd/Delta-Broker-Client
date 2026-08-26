@@ -276,6 +276,10 @@ export default function HomePage() {
                     : "Approve or reject registrations"}
                 </span>
               </Link>
+              <Link href="/analytics" className={styles.quickCard}>
+                <strong>Analytics</strong>
+                <span>Broker joins by year / month</span>
+              </Link>
               <Link href="/brokers" className={styles.quickCard}>
                 <strong>All brokers</strong>
                 <span>Full partner directory</span>
