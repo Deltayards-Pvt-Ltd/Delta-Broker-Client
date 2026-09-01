@@ -10,8 +10,7 @@ export default function NewOfferPage() {
         <div>
           <h1 className={styles.title}>New offer</h1>
           <p className={styles.sub}>
-            Active offers show for all partners. Optionally notify everyone with
-            a broadcast.
+            Active is live for partners. Leave Inactive to keep it admin-only.
           </p>
         </div>
       </div>

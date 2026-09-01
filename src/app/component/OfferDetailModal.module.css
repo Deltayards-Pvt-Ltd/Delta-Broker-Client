@@ -152,6 +152,11 @@
   color: #f59e0b;
 }
 
+.badgeExpired {
+  background: rgba(198, 40, 40, 0.12);
+  color: #c62828;
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;

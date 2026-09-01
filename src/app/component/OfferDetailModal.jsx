@@ -7,6 +7,7 @@ import { useAuth } from "@/context/AuthContext";
 import { isStaffRole, isSuperAdminRole } from "@/lib/roles";
 import { downloadNamedImage } from "@/lib/downloadAsset";
 import { offerBadge } from "@/lib/offerBadge";
+import { offerChipLabel } from "@/lib/offerCoverage";
 import styles from "./OfferDetailModal.module.css";
 
 function formatRange(startsAt, endsAt) {
@@ -64,7 +65,8 @@ export default function OfferDetailModal({
 
   const image = String(offer?.bannerImage || "").trim();
   const range = offer ? formatRange(offer.startsAt, offer.endsAt) : null;
-  const badge = offer ? offerBadge(offer.startsAt, offer.endsAt) : null;
+  const badge = offer ? offerBadge(offer.startsAt, offer.endsAt, offer) : null;
+  const chipLabel = offer ? offerChipLabel(offer) : "Global";
 
   const onDownload = async () => {
     if (!image || dlBusy) return;
@@ -120,39 +122,33 @@ export default function OfferDetailModal({
             ) : null}
 
             <div className={styles.body}>
-              <p className={styles.eyebrow}>
-                {offer.project?.name
-                  ? `Project · ${offer.project.name}`
-                  : "Global offer"}
-              </p>
+              <p className={styles.eyebrow}>{chipLabel}</p>
               <h2 id="offer-detail-title" className={styles.title}>
                 {offer.title}
               </h2>
               {range ? <p className={styles.hint}>{range}</p> : null}
 
               <div className={styles.badges}>
-                {isStaff ? (
-                  <>
-                    <span
-                      className={`${styles.badge} ${
-                        offer.active ? styles.badgeOn : styles.badgeOff
-                      }`}
-                    >
-                      {offer.active ? "Active" : "Inactive"}
-                    </span>
-                    {offer.expired ? (
-                      <span className={`${styles.badge} ${styles.badgeExpire}`}>
-                        Expired
-                      </span>
-                    ) : null}
-                  </>
+                <span className={`${styles.badge} ${styles.badgeStart}`}>
+                  {chipLabel}
+                </span>
+                {isStaff && !offer.expired ? (
+                  <span
+                    className={`${styles.badge} ${
+                      offer.active ? styles.badgeOn : styles.badgeOff
+                    }`}
+                  >
+                    {offer.active ? "Active" : "Inactive"}
+                  </span>
                 ) : null}
                 {badge ? (
                   <span
                     className={`${styles.badge} ${
-                      badge.kind === "start"
-                        ? styles.badgeStart
-                        : styles.badgeExpire
+                      badge.kind === "expired"
+                        ? styles.badgeExpired
+                        : badge.kind === "start"
+                          ? styles.badgeStart
+                          : styles.badgeExpire
                     }`}
                   >
                     {badge.label}

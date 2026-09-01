@@ -4,7 +4,6 @@ const TOKEN_KEY = "delta_broker_token";
 const USER_KEY = "delta_broker_user";
 
 export const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
-export const CRM_API_URL = process.env.NEXT_PUBLIC_CRM_API_URL;
 
 export function getToken() {
   if (typeof window === "undefined") return null;
