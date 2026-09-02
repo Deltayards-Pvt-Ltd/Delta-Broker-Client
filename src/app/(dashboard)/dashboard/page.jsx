@@ -299,6 +299,10 @@ export default function HomePage() {
                 <strong>Leads</strong>
                 <span>Clients you referred to Delta Yards</span>
               </Link>
+              <Link href="/analytics" className={styles.quickCard}>
+                <strong>Analytics</strong>
+                <span>Your leads by status</span>
+              </Link>
               <Link href="/offers" className={styles.quickCard}>
                 <strong>Offers</strong>
                 <span>Partner schemes & incentives</span>

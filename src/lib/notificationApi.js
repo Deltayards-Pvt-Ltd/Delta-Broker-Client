@@ -61,6 +61,9 @@ export function notificationHref(n) {
     if (link) return link;
     return "/dashboard";
   }
+  if (n?.type === "lead" || n?.type === "leadCreated" || n?.type === "leadUpdated") {
+    return n?.meta?.link || (n?.meta?.leadId ? `/leads/${n.meta.leadId}` : "/leads");
+  }
   const link = n?.meta?.link;
   if (link) return link;
   return null;

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import {
   Area,
   AreaChart,
@@ -17,8 +18,11 @@ import {
   Tooltip,
   XAxis,
   YAxis,
+  Label,
 } from "recharts";
+import { ChartColumn, PieChart as LucidePie, TrendingUp } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
+import { statusBadgeColors } from "@/lib/leadDisplay";
 import styles from "./Chart.module.css";
 
 const GOLD = "#C5A059";
@@ -128,24 +132,114 @@ function Cartesian({
   );
 }
 
-function PieViz({ data, dataKey, xKey, name, theme, ...rest }) {
+function sliceFill(row, i) {
+  return (
+    row.color ||
+    statusBadgeColors(row.label || row.name).bg ||
+    PIE_COLORS[i % PIE_COLORS.length]
+  );
+}
+
+function TitleIcon({ type }) {
+  const props = { size: 16, strokeWidth: 2.25, className: styles.titleIcon };
+  if (type === "pie") return <LucidePie {...props} />;
+  if (type === "line" || type === "area") return <TrendingUp {...props} />;
+  return <ChartColumn {...props} />;
+}
+
+function PieViz({ data, dataKey, xKey, name, theme, total, ...rest }) {
+  const RAD = Math.PI / 180;
+  const sum =
+    total ?? data.reduce((n, row) => n + (Number(row[dataKey]) || 0), 0);
+  const pieKey = data.map((row) => `${row[xKey]}:${row[dataKey]}`).join("|");
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    setReady(false);
+    const t = requestAnimationFrame(() => setReady(true));
+    return () => cancelAnimationFrame(t);
+  }, [pieKey]);
+
+  if (!ready) return null;
+
   return (
     <PieChart {...rest}>
       <Pie
+        key={pieKey}
         data={data}
         dataKey={dataKey}
         nameKey={xKey}
         cx="50%"
         cy="50%"
-        innerRadius={58}
+        innerRadius={62}
         outerRadius={96}
         paddingAngle={2}
+        isAnimationActive
+        animationBegin={0}
+        animationDuration={800}
+        animationEasing="ease-out"
+        labelLine={false}
+        label={({ cx, cy, midAngle, innerRadius, outerRadius, value }) => {
+          if (!value) return null;
+          const r = (innerRadius + outerRadius) / 2;
+          const x = cx + r * Math.cos(-midAngle * RAD);
+          const y = cy + r * Math.sin(-midAngle * RAD);
+          return (
+            <text
+              x={x}
+              y={y}
+              fill="#FFFFFF"
+              textAnchor="middle"
+              dominantBaseline="central"
+              fontSize={12}
+              fontWeight={700}
+            >
+              {value}
+            </text>
+          );
+        }}
       >
-        {data.map((_, i) => (
-          <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+        {data.map((row, i) => (
+          <Cell key={i} fill={sliceFill(row, i)} />
         ))}
+        <Label
+          content={({ viewBox }) => {
+            const cx = viewBox?.cx;
+            const cy = viewBox?.cy;
+            if (cx == null || cy == null) return null;
+            return (
+              <g>
+                <text
+                  x={cx}
+                  y={cy - 12}
+                  textAnchor="middle"
+                  fill={theme.axis}
+                  fontSize={10}
+                  fontWeight={700}
+                  letterSpacing="0.08em"
+                >
+                  TOTAL
+                </text>
+                <text
+                  x={cx}
+                  y={cy + 14}
+                  textAnchor="middle"
+                  fill={theme.ink}
+                  fontSize={22}
+                  fontWeight={800}
+                >
+                  {sum}
+                </text>
+              </g>
+            );
+          }}
+        />
       </Pie>
-      <Legend />
+      <Legend
+        formatter={(value, entry) =>
+          `${value}  ·  ${entry?.payload?.[dataKey] ?? ""}`
+        }
+      />
       <Tooltip {...tipProps(theme, name)} />
     </PieChart>
   );
@@ -172,6 +266,7 @@ export default function Chart({
   loading = false,
   empty = "No data.",
   actions,
+  filterBar,
 }) {
   const theme = useChartTheme();
 
@@ -186,7 +281,7 @@ export default function Chart({
       <div className={styles.chartBody} style={{ height }}>
         <ResponsiveContainer width="100%" height="100%">
           {type === "pie" ? (
-            <PieViz {...shared} />
+            <PieViz {...shared} total={total} />
           ) : (
             <Cartesian type={type} color={color} {...shared} />
           )}
@@ -197,14 +292,24 @@ export default function Chart({
 
   return (
     <section className={styles.block}>
-      {title || actions ? (
+      {title || actions || filterBar ? (
         <div className={styles.head}>
-          {title ? <h2 className={styles.title}>{title}</h2> : <span />}
-          {actions}
+          <div className={styles.headTop}>
+            {title ? (
+              <div className={styles.titleRow}>
+                <TitleIcon type={type} />
+                <h2 className={styles.title}>{title}</h2>
+              </div>
+            ) : (
+              <span />
+            )}
+            {actions ? <div className={styles.actions}>{actions}</div> : null}
+          </div>
+          {filterBar ? <div className={styles.filterBar}>{filterBar}</div> : null}
         </div>
       ) : null}
-      <div className={styles.card}>
-        {total != null ? (
+      <div className={type === "pie" ? `${styles.card} ${styles.cardPie}` : styles.card}>
+        {total != null && type !== "pie" ? (
           <p className={styles.total}>
             <span>Total</span>
             <strong>{total}</strong>

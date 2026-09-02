@@ -64,6 +64,10 @@ export async function fetchLeadById(id) {
   return apiGet(`/api/leads/${encodeURIComponent(id)}`);
 }
 
-export async function fetchLeadFilterMeta() {
-  return apiGet("/api/leads/meta");
+export async function fetchLeadFilterMeta(opts = {}) {
+  const qs = new URLSearchParams();
+  if (opts.startDate) qs.set("startDate", opts.startDate);
+  if (opts.endDate) qs.set("endDate", opts.endDate);
+  const q = qs.toString();
+  return apiGet(`/api/leads/meta${q ? `?${q}` : ""}`);
 }

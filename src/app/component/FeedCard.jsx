@@ -9,6 +9,7 @@ import {
   PartyPopper,
   Settings,
   Trash2,
+  User,
   Users,
   UserPlus,
 } from "lucide-react";
@@ -19,15 +20,19 @@ const KIND_META = {
   cp_meet: { label: "CP MEET", Icon: Users },
   project: { label: "NEW PROJECT", Icon: Home },
   policy: { label: "POLICY", Icon: FileText },
-  offer: { label: "OFFER", Icon: Gift },
-  system: { label: "SYSTEM", Icon: Settings },
-};
+    offer: { label: "OFFER", Icon: Gift },
+    system: { label: "SYSTEM", Icon: Settings },
+    lead: { label: "LEAD", Icon: User },
+  };
 
 const TYPE_META = {
   approvalRequired: { label: "APPROVAL", Icon: UserPlus },
   welcome: { label: "WELCOME", Icon: PartyPopper },
   approved: { label: "APPROVED", Icon: BadgeCheck },
   broadcast: { label: "BROADCAST", Icon: Megaphone },
+  lead: { label: "LEAD", Icon: User },
+  leadCreated: { label: "LEAD", Icon: User },
+  leadUpdated: { label: "LEAD", Icon: User },
 };
 
 export function relativeTime(date) {
@@ -56,7 +61,11 @@ export function metaFromBroadcast(item) {
 
 export function metaFromUpdate(item) {
   const kind = item?.meta?.kind;
-  if (item?.type === "broadcast" && kind && KIND_META[kind]) {
+  const useKind =
+    kind &&
+    KIND_META[kind] &&
+    (item?.type === "broadcast" || item?.type === "lead" || kind === "lead");
+  if (useKind) {
     return {
       label: KIND_META[kind].label,
       Icon: KIND_META[kind].Icon,
