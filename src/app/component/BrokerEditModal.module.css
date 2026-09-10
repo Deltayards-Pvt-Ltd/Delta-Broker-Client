@@ -5,7 +5,7 @@
   display: grid;
   place-items: center;
   padding: 1rem;
-  background: rgba(5, 5, 8, 0.72);
+  background: rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
 }
@@ -15,10 +15,9 @@
   max-height: min(92dvh, 760px);
   overflow: auto;
   border-radius: 16px;
-  border: 1px solid rgba(197, 160, 89, 0.22);
-  background:
-    linear-gradient(160deg, rgba(28, 32, 44, 0.98) 0%, rgba(12, 14, 20, 0.98) 100%);
-  box-shadow: 0 28px 64px -24px rgba(0, 0, 0, 0.75);
+  border: 1px solid rgba(197, 160, 89, 0.28);
+  background: var(--surface);
+  box-shadow: var(--shadow-lift);
   color: var(--ink-body);
 }
 
@@ -53,6 +52,24 @@
   font-size: 0.8rem;
   font-weight: 650;
   letter-spacing: 0.04em;
+  color: var(--primary);
+}
+
+.leadsMeta {
+  margin: 0.35rem 0 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink-muted);
+  text-decoration: none;
+  display: inline-block;
+}
+
+.leadsMeta strong {
+  color: var(--ink);
+  font-weight: 800;
+}
+
+a.leadsMeta:hover strong {
   color: var(--primary);
 }
 
@@ -100,7 +117,7 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--primary);
+  color: var(--ink-muted);
 }
 
 .field input,
@@ -109,7 +126,7 @@
   padding: 0 0.85rem;
   border-radius: 10px;
   border: 1px solid var(--line);
-  background: rgba(0, 0, 0, 0.28);
+  background: var(--surface-muted);
   color: var(--ink);
   font-size: 0.9375rem;
 }
@@ -117,13 +134,14 @@
 .field input:focus,
 .field select:focus {
   outline: none;
-  border-color: rgba(197, 160, 89, 0.5);
-  box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.12);
+  border-color: var(--primary);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px var(--primary-focus);
 }
 
 .error {
   margin: 0;
-  color: #f87171;
+  color: var(--danger);
   font-size: 0.875rem;
 }
 
@@ -157,8 +175,8 @@
 
 .save {
   border: none;
-  background: #c5a059;
-  color: #0b0b0c;
+  background: linear-gradient(180deg, #d4b06a 0%, #c5a059 55%, #b08d45 100%);
+  color: #14110c;
 }
 
 .save:hover:not(:disabled) {
@@ -186,7 +204,7 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--primary);
+  color: var(--ink-muted);
 }
 
 .hint {
@@ -206,7 +224,7 @@
   padding: 0.35rem 0.85rem;
   border-radius: 999px;
   border: 1px solid var(--line);
-  background: transparent;
+  background: var(--surface-muted);
   color: var(--ink-muted);
   font-size: 0.8rem;
   font-weight: 650;

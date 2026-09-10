@@ -24,7 +24,7 @@ import {
   Users,
   Zap,
 } from "lucide-react";
-import { fetchLeadById } from "@/lib/leadApi";
+import { fetchBrokerLead } from "@/lib/brokerApi";
 import {
   extraFieldIcon,
   formatLeadDate,
@@ -37,7 +37,7 @@ import {
   leadStatus,
   statusBadgeColors,
 } from "@/lib/leadDisplay";
-import styles from "../leads.module.css";
+import styles from "../../../../leads/leads.module.css";
 
 const PREVIEW_COUNT = 5;
 
@@ -129,20 +129,20 @@ function ActivityList({ items }) {
   );
 }
 
-export default function LeadDetailsPage() {
-  const { id } = useParams();
+export default function BrokerLeadDetailsPage() {
+  const { id, leadId } = useParams();
   const [lead, setLead] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!id) return;
+    if (!id || !leadId) return;
     let alive = true;
     (async () => {
       setLoading(true);
       setError("");
       try {
-        const data = await fetchLeadById(id);
+        const data = await fetchBrokerLead(id, leadId);
         if (alive) setLead(data.lead || null);
       } catch (err) {
         if (alive) setError(err.message || "Failed to load lead");
@@ -153,7 +153,7 @@ export default function LeadDetailsPage() {
     return () => {
       alive = false;
     };
-  }, [id]);
+  }, [id, leadId]);
 
   const name = leadName(lead);
   const phone = leadPhone(lead);
@@ -166,7 +166,7 @@ export default function LeadDetailsPage() {
 
   return (
     <div className={styles.page}>
-      <Link href="/leads" className={styles.back}>
+      <Link href={`/brokers/${id}/leads`} className={styles.back}>
         <ChevronLeft size={18} strokeWidth={2} />
         Leads
       </Link>

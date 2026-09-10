@@ -221,11 +221,6 @@
   color: var(--ink-body);
   font-size: 0.9rem;
   font-weight: 600;
-  cursor: pointer;
-}
-
-.phoneBtn:hover {
-  color: #059669;
 }
 
 .callWell {
@@ -395,14 +390,9 @@
   gap: 0.5rem;
   padding: 0.4rem 0.75rem;
   border-radius: 999px;
-  text-decoration: none;
   color: var(--ink);
   background: rgba(16, 185, 129, 0.1);
   font-weight: 600;
-}
-
-.heroPhone:hover {
-  background: rgba(16, 185, 129, 0.16);
 }
 
 .callWell {

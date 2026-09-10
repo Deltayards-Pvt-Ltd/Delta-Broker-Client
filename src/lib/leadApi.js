@@ -38,6 +38,12 @@ function leadQs(extra = {}) {
   if (extra.statusId) qs.set("statusId", extra.statusId);
   if (extra.page) qs.set("page", String(extra.page));
   if (extra.limit) qs.set("limit", String(extra.limit));
+  if (extra.startDate) qs.set("startDate", extra.startDate);
+  if (extra.endDate) qs.set("endDate", extra.endDate);
+  if (extra.mode) qs.set("mode", extra.mode);
+  if (extra.year) qs.set("year", String(extra.year));
+  if (extra.fromYear) qs.set("fromYear", String(extra.fromYear));
+  if (extra.toYear) qs.set("toYear", String(extra.toYear));
   return qs.toString();
 }
 
@@ -80,6 +86,22 @@ export async function fetchLeadById(id) {
   return crmGet(`/api/dcp/leads/${encodeURIComponent(id)}?${leadQs()}`);
 }
 
-export async function fetchLeadFilterMeta() {
-  return crmGet(`/api/dcp/leads/meta?${leadQs()}`);
+export async function fetchLeadFilterMeta(opts = {}) {
+  return crmGet(
+    `/api/dcp/leads/meta?${leadQs({
+      startDate: opts.startDate,
+      endDate: opts.endDate,
+    })}`
+  );
+}
+
+export async function fetchFcSeries(opts = {}) {
+  return crmGet(
+    `/api/dcp/leads/fc-series?${leadQs({
+      mode: opts.mode,
+      year: opts.year,
+      fromYear: opts.fromYear,
+      toYear: opts.toYear,
+    })}`
+  );
 }

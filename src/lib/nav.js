@@ -16,6 +16,12 @@ export const NAV_ITEMS = [
     icon: "home",
   },
   {
+    id: "analytics",
+    label: "Analytics",
+    href: "/analytics",
+    icon: "chart",
+  },
+  {
     id: "approvals",
     label: "Approvals",
     href: "/approvals",
@@ -135,6 +141,11 @@ export const TOP_TABS = [
     href: "/dashboard",
   },
   {
+    id: "analytics",
+    label: "Analytics",
+    href: "/analytics",
+  },
+  {
     id: "approvals",
     label: "Approvals",
     href: "/approvals",
@@ -217,6 +228,7 @@ export function canAccessPath(pathname, role) {
     }
     if (
       pathname === "/dashboard" ||
+      pathname === "/analytics" ||
       pathname === "/profile" ||
       pathname === "/profile/password" ||
       pathname === "/password-reset" ||
@@ -239,6 +251,7 @@ export function canAccessPath(pathname, role) {
 
   // Broker
   if (pathname === "/dashboard") return true;
+  if (pathname === "/analytics") return true;
   if (pathname === "/profile") return true;
   if (pathname === "/profile/password") return true;
   if (pathname === "/updates") return true;
