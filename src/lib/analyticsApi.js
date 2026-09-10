@@ -1,10 +1,6 @@
-<<<<<<< HEAD
 import { API_URL, getToken, getUser } from "@/lib/auth";
 import { isBrokerRole, isStaffRole } from "@/lib/roles";
 import { fetchFcSeries, fetchLeadFilterMeta } from "@/lib/leadApi";
-=======
-import { API_URL, getToken } from "@/lib/auth";
->>>>>>> 99b5f3f8eb642ce7ec434db039445b5b1e490468
 
 function authHeaders() {
   const token = getToken();
@@ -15,49 +11,30 @@ function authHeaders() {
 }
 
 async function parse(res) {
-<<<<<<< HEAD
   const data = await res.json().catch(() => ({}));
-=======
-  const data = await res.json();
->>>>>>> 99b5f3f8eb642ce7ec434db039445b5b1e490468
   if (!res.ok) throw new Error(data.message || "Request failed");
   return data;
 }
 
-<<<<<<< HEAD
 function analyticsQs(opts = {}) {
   const params = new URLSearchParams();
   const mode = opts.mode || "month";
   params.set("mode", mode);
   if (mode === "year") {
-=======
-/**
- * @param {{ mode: "year"|"month"|"quarter", year?: number, fromYear?: number, toYear?: number }} opts
- */
-export async function fetchBrokerAnalytics(opts) {
-  const params = new URLSearchParams();
-  params.set("mode", opts.mode);
-  if (opts.mode === "year") {
->>>>>>> 99b5f3f8eb642ce7ec434db039445b5b1e490468
     if (opts.fromYear) params.set("fromYear", String(opts.fromYear));
     if (opts.toYear) params.set("toYear", String(opts.toYear));
   } else if (opts.year) {
     params.set("year", String(opts.year));
   }
-<<<<<<< HEAD
   return params.toString();
 }
 
 export async function fetchBrokerJoins(opts = {}) {
   const res = await fetch(`${API_URL}/api/analytics/brokers?${analyticsQs(opts)}`, {
-=======
-  const res = await fetch(`${API_URL}/api/analytics/brokers?${params}`, {
->>>>>>> 99b5f3f8eb642ce7ec434db039445b5b1e490468
     headers: authHeaders(),
   });
   return parse(res);
 }
-<<<<<<< HEAD
 
 export async function fetchTopPartners(opts = {}) {
   const params = new URLSearchParams();
@@ -230,5 +207,3 @@ export async function fetchAnalytics(opts = {}) {
 
   return { role: user.role, charts };
 }
-=======
->>>>>>> 99b5f3f8eb642ce7ec434db039445b5b1e490468
