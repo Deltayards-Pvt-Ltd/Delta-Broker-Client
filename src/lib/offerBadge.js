@@ -25,8 +25,21 @@ export function expiringSoonLabel(endsAt) {
   return `Expiring in ${days} days`;
 }
 
-/** Prefer starting badge over expiring when not live yet. */
-export function offerBadge(startsAt, endsAt) {
+export function isOfferExpired(offerOrEndsAt) {
+  if (offerOrEndsAt && typeof offerOrEndsAt === "object") {
+    if (offerOrEndsAt.expired === true) return true;
+    const days = daysUntil(offerOrEndsAt.endsAt);
+    return days != null && days < 0;
+  }
+  const days = daysUntil(offerOrEndsAt);
+  return days != null && days < 0;
+}
+
+/** Prefer expired → starting soon → expiring soon. */
+export function offerBadge(startsAt, endsAt, extra) {
+  if (isOfferExpired({ expired: extra?.expired, endsAt })) {
+    return { kind: "expired", label: "Expired" };
+  }
   const start = startingSoonLabel(startsAt);
   if (start) return { kind: "start", label: start };
   const end = expiringSoonLabel(endsAt);

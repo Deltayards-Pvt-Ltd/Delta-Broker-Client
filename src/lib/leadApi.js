@@ -1,38 +1,16 @@
-import { CRM_API_URL, getUser } from "@/lib/auth";
-import { isBrokerRole } from "@/lib/roles";
+import { API_URL, getToken } from "@/lib/auth";
 
-function crmBase() {
-  if (!CRM_API_URL) {
-    throw new Error("NEXT_PUBLIC_CRM_API_URL is not set");
-  }
-  return CRM_API_URL.replace(/\/$/, "");
-}
-
-function brokerIdentity() {
-  const user = getUser();
-  if (!user) throw new Error("Not logged in");
-  if (!isBrokerRole(user.role)) {
-    throw new Error("Only channel partners can view leads");
-  }
-
-  const phone = String(user.phone || "").replace(/\D/g, "").slice(-10);
-  const dcpId = String(user.membershipId || user.dcpId || "")
-    .trim()
-    .toUpperCase();
-
-  if (!phone || phone.length !== 10) {
-    throw new Error("Phone number missing on this account");
-  }
-  if (!dcpId) {
-    throw new Error("DCP ID missing on this account");
-  }
-
-  return { phone, dcpId };
+function authHeaders() {
+  const token = getToken();
+  if (!token) throw new Error("Not authenticated — login again");
+  return {
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${token}`,
+  };
 }
 
 function leadQs(extra = {}) {
-  const { phone, dcpId } = brokerIdentity();
-  const qs = new URLSearchParams({ mobileNumber: phone, dcpId });
+  const qs = new URLSearchParams();
   if (extra.q) qs.set("q", extra.q);
   if (extra.projectId) qs.set("projectId", extra.projectId);
   if (extra.statusId) qs.set("statusId", extra.statusId);
@@ -47,14 +25,20 @@ function leadQs(extra = {}) {
   return qs.toString();
 }
 
-async function crmGet(path) {
+async function apiGet(path) {
+  if (!API_URL) {
+    throw new Error("NEXT_PUBLIC_BACKEND_URL is not set");
+  }
+
   let res;
   try {
-    res = await fetch(`${crmBase()}${path}`);
+    res = await fetch(`${API_URL.replace(/\/$/, "")}${path}`, {
+      headers: authHeaders(),
+    });
   } catch (e) {
     throw new Error(
       e?.message?.includes("Network") || e?.message?.includes("Failed to fetch")
-        ? `Cannot reach CRM at ${crmBase()}`
+        ? "Cannot reach server"
         : e.message || "Network error"
     );
   }
@@ -67,7 +51,7 @@ async function crmGet(path) {
 }
 
 export async function fetchLeadCountForChannelPartner() {
-  return crmGet(`/api/dcp/leads/count?${leadQs()}`);
+  return apiGet("/api/leads/count");
 }
 
 /** Same contract as mobile: page/limit default 20. */
@@ -78,15 +62,16 @@ export async function fetchLeadsForChannelPartner({
   projectId,
   statusId,
 } = {}) {
-  return crmGet(`/api/dcp/leads?${leadQs({ page, limit, q, projectId, statusId })}`);
+  return apiGet(`/api/leads?${leadQs({ page, limit, q, projectId, statusId })}`);
 }
 
 export async function fetchLeadById(id) {
   if (!id) throw new Error("Lead id is required");
-  return crmGet(`/api/dcp/leads/${encodeURIComponent(id)}?${leadQs()}`);
+  return apiGet(`/api/leads/${encodeURIComponent(id)}`);
 }
 
 export async function fetchLeadFilterMeta(opts = {}) {
+<<<<<<< HEAD
   return crmGet(
     `/api/dcp/leads/meta?${leadQs({
       startDate: opts.startDate,
@@ -104,4 +89,11 @@ export async function fetchFcSeries(opts = {}) {
       toYear: opts.toYear,
     })}`
   );
+=======
+  const qs = new URLSearchParams();
+  if (opts.startDate) qs.set("startDate", opts.startDate);
+  if (opts.endDate) qs.set("endDate", opts.endDate);
+  const q = qs.toString();
+  return apiGet(`/api/leads/meta${q ? `?${q}` : ""}`);
+>>>>>>> 99b5f3f8eb642ce7ec434db039445b5b1e490468
 }

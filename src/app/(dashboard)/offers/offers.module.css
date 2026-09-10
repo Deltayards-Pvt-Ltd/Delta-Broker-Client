@@ -174,11 +174,107 @@
   border-radius: 10px;
 }
 
-.badgeExpire {
-  background: #b45309;
-  color: #ffffff;
-  border-color: transparent;
+.badgeExpired {
+  background: rgba(198, 40, 40, 0.12);
+  color: #c62828;
+  border-color: rgba(198, 40, 40, 0.4);
   border-radius: 10px;
+}
+
+.filterRow {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.segment {
+  flex: 1;
+  display: flex;
+  padding: 3px;
+  border-radius: 12px;
+  background: var(--surface-muted);
+  min-width: 0;
+}
+
+.segmentBtn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--ink-muted);
+  border-radius: 10px;
+  padding: 0.5rem 0.7rem;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.segmentOn {
+  background: var(--primary, #c5a059);
+  color: var(--on-primary, #1a1f2b);
+}
+
+.scopeWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.scopeDrop {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 6.5rem;
+  border: 1px solid var(--line);
+  background: var(--surface-muted);
+  color: var(--ink);
+  border-radius: 12px;
+  padding: 0.5rem 0.7rem;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.scopeDrop:hover {
+  border-color: var(--line-hover);
+}
+
+.scopeMenu {
+  position: absolute;
+  z-index: 24;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 10rem;
+  list-style: none;
+  margin: 0;
+  padding: 0.35rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+}
+
+.scopeItem {
+  display: block;
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 0.55rem 0.7rem;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.scopeItem:hover {
+  background: var(--surface-muted);
+}
+
+.scopeItemOn {
+  color: var(--primary);
 }
 
 .tabs {
@@ -316,6 +412,7 @@
   flex-direction: column;
   gap: 0.9rem;
   padding: 1.15rem 1.2rem;
+  overflow: visible;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-xl, 16px);
@@ -577,6 +674,42 @@
   }
 }
 
+.checkList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-muted);
+}
+
+.checkGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 0.55rem;
+  border-top: 1px dashed var(--line);
+}
+
+.checkList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface-muted);
+}
+
+.checkGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-top: 0.55rem;
+  border-top: 1px dashed var(--line);
+}
+
 .checkRow {
   display: flex;
   align-items: flex-start;
@@ -653,8 +786,74 @@
   cursor: not-allowed;
 }
 
-.projectSelect {
+.coverDrop {
   position: relative;
+  max-width: 360px;
+}
+
+.coverTrigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.55rem 0.75rem;
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  color: var(--ink);
+  background: var(--surface-muted);
+}
+
+.coverMenu {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+}
+
+.coverRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.4rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.coverRow:hover {
+  background: var(--surface-muted);
+}
+
+.coverRow input {
+  margin: 0;
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  accent-color: var(--primary);
+}
+
+.coverRowOff {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .selectMenu {

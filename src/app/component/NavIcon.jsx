@@ -7,7 +7,11 @@ import {
   Bell,
   Gift,
   ContactRound,
+<<<<<<< HEAD
   BarChart3,
+=======
+  ChartColumn,
+>>>>>>> 99b5f3f8eb642ce7ec434db039445b5b1e490468
 } from "lucide-react";
 
 const ICONS = {
@@ -19,7 +23,11 @@ const ICONS = {
   bell: Bell,
   gift: Gift,
   contact: ContactRound,
+<<<<<<< HEAD
   chart: BarChart3,
+=======
+  chart: ChartColumn,
+>>>>>>> 99b5f3f8eb642ce7ec434db039445b5b1e490468
 };
 
 export function NavIcon({ name, size = 18 }) {

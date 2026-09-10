@@ -234,6 +234,8 @@ export function canAccessPath(pathname, role) {
       pathname === "/password-reset" ||
       pathname === "/password-reset/change" ||
       pathname === "/broadcast" ||
+      pathname === "/analytics" ||
+      pathname.startsWith("/analytics/") ||
       pathname.startsWith("/brokers") ||
       pathname === "/projects" ||
       pathname === "/projects/active" ||
@@ -254,6 +256,7 @@ export function canAccessPath(pathname, role) {
   if (pathname === "/analytics") return true;
   if (pathname === "/profile") return true;
   if (pathname === "/profile/password") return true;
+  if (pathname === "/analytics" || pathname.startsWith("/analytics/")) return true;
   if (pathname === "/updates") return true;
   if (pathname === "/projects") return true;
   if (pathname === "/leads" || pathname.startsWith("/leads/")) return true;

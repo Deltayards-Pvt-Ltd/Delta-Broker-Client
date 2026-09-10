@@ -1,25 +1,29 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { Gift, Plus, Pencil, Trash2 } from "lucide-react";
+import { ChevronDown, Gift, Plus, Pencil, Trash2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { isBrokerRole, isStaffRole, isSuperAdminRole } from "@/lib/roles";
 import { deleteOffer, fetchOffers } from "@/lib/offerApi";
 import { offerBadge } from "@/lib/offerBadge";
+import { offerChipLabel } from "@/lib/offerCoverage";
 import OfferDetailModal from "@/app/component/OfferDetailModal";
 import styles from "./offers.module.css";
 
-const SCOPE_TABS = [
+const SCOPES = [
   { id: "all", label: "All", scope: undefined },
   { id: "global", label: "Global", scope: "global" },
   { id: "project", label: "Projects", scope: "project" },
 ];
 
-const STATUS_TABS = [
-  { id: "all", label: "All", filter: undefined },
-  { id: "live", label: "Live", filter: "live" },
+const SECTIONS = [
+  { id: "live", label: "Active", filter: "live" },
   { id: "expired", label: "Expired", filter: "expired" },
+];
+
+const STAFF_SECTIONS = [
+  ...SECTIONS,
   { id: "inactive", label: "Inactive", filter: "inactive" },
 ];
 
@@ -51,17 +55,30 @@ export default function OffersPage() {
   const isBroker = isBrokerRole(user?.role);
 
   const [scopeTab, setScopeTab] = useState("all");
-  const [statusTab, setStatusTab] = useState("all");
+  const [statusTab, setStatusTab] = useState("live");
+  const [scopeOpen, setScopeOpen] = useState(false);
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [ok, setOk] = useState("");
   const [selected, setSelected] = useState(null);
+  const [buckets, setBuckets] = useState({
+    active: 0,
+    expired: 0,
+    inactive: 0,
+  });
+  const scopeRef = useRef(null);
 
-  const scope = SCOPE_TABS.find((t) => t.id === scopeTab)?.scope;
-  const filter = isStaff
-    ? STATUS_TABS.find((t) => t.id === statusTab)?.filter
-    : undefined;
+  const sections = isStaff ? STAFF_SECTIONS : SECTIONS;
+  const scopeMeta = SCOPES.find((t) => t.id === scopeTab) || SCOPES[0];
+  const sectionMeta = sections.find((t) => t.id === statusTab) || SECTIONS[0];
+  const scope = isStaff ? scopeMeta.scope : undefined;
+  const filter = isStaff ? sectionMeta.filter : "live";
+  const hasAnyOffers =
+    buckets.active +
+      (isStaff ? buckets.expired + (buckets.inactive || 0) : 0) >
+    0;
+  const showFilters = isStaff && hasAnyOffers;
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -69,6 +86,7 @@ export default function OffersPage() {
     try {
       const data = await fetchOffers({ page: 1, limit: 50, scope, filter });
       setOffers(data.offers || []);
+      if (data.buckets) setBuckets(data.buckets);
     } catch (err) {
       setError(err.message || "Failed to load offers");
       setOffers([]);
@@ -80,6 +98,15 @@ export default function OffersPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    if (!scopeOpen) return;
+    const onDoc = (e) => {
+      if (!scopeRef.current?.contains(e.target)) setScopeOpen(false);
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, [scopeOpen]);
 
   const onDelete = async (id) => {
     if (!canDelete) return;
@@ -97,12 +124,16 @@ export default function OffersPage() {
   };
 
   const emptyCopy = useMemo(() => {
-    if (isBroker) return "Check back soon for new partner incentives.";
-    if (statusTab === "expired") return "No expired offers in this view.";
-    if (statusTab === "inactive") return "No inactive offers.";
-    if (statusTab === "live") return "No live offers right now.";
-    return "Create a global or project offer for channel partners.";
-  }, [isBroker, statusTab]);
+    if (isBroker) return "Check back soon for partner incentives.";
+    if (!hasAnyOffers) {
+      return "Create a global or project offer for channel partners.";
+    }
+    const scopeLabel =
+      scopeTab === "all" ? "" : `${scopeMeta.label.toLowerCase()} `;
+    if (statusTab === "expired") return `No expired ${scopeLabel}offers.`;
+    if (statusTab === "inactive") return "No paused offers. Inactive is hidden from partners.";
+    return `No ${scopeLabel}offers right now.`;
+  }, [hasAnyOffers, isBroker, statusTab, scopeTab, scopeMeta.label]);
 
   return (
     <div className={styles.page}>
@@ -112,7 +143,7 @@ export default function OffersPage() {
           <p className={styles.sub}>
             {isBroker
               ? "Schemes and incentives from Delta Yards."
-              : "Past end date auto-deactivates for partners. Super admin can extend dates and re-activate anytime."}
+              : "Active is live for partners. Inactive is admin-only. Expired is past the end date."}
           </p>
         </div>
         {canCreate ? (
@@ -122,37 +153,61 @@ export default function OffersPage() {
         ) : null}
       </div>
 
-      {isStaff ? (
-        <div className={styles.tabs} role="tablist" aria-label="Offer status">
-          {STATUS_TABS.map((t) => (
+      {!loading && showFilters ? (
+      <div className={styles.filterRow}>
+        <div className={styles.segment} role="tablist" aria-label="Offer status">
+          {sections.map((t) => (
             <button
               key={t.id}
               type="button"
               role="tab"
               aria-selected={statusTab === t.id}
-              className={`${styles.tab} ${statusTab === t.id ? styles.tabOn : ""}`}
+              className={`${styles.segmentBtn} ${
+                statusTab === t.id ? styles.segmentOn : ""
+              }`}
               onClick={() => setStatusTab(t.id)}
             >
               {t.label}
             </button>
           ))}
         </div>
-      ) : null}
 
-      <div className={styles.tabs} role="tablist" aria-label="Offer placement">
-        {SCOPE_TABS.map((t) => (
+        <div className={styles.scopeWrap} ref={scopeRef}>
           <button
-            key={t.id}
             type="button"
-            role="tab"
-            aria-selected={scopeTab === t.id}
-            className={`${styles.tab} ${scopeTab === t.id ? styles.tabOn : ""}`}
-            onClick={() => setScopeTab(t.id)}
+            className={styles.scopeDrop}
+            aria-haspopup="listbox"
+            aria-expanded={scopeOpen}
+            onClick={() => setScopeOpen((v) => !v)}
           >
-            {t.label}
+            {scopeMeta.label}
+            <ChevronDown size={14} />
           </button>
-        ))}
+          {scopeOpen ? (
+            <ul className={styles.scopeMenu} role="listbox">
+              {SCOPES.map((s) => (
+                <li key={s.id}>
+                  <button
+                    type="button"
+                    role="option"
+                    aria-selected={scopeTab === s.id}
+                    className={`${styles.scopeItem} ${
+                      scopeTab === s.id ? styles.scopeItemOn : ""
+                    }`}
+                    onClick={() => {
+                      setScopeTab(s.id);
+                      setScopeOpen(false);
+                    }}
+                  >
+                    {s.label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
       </div>
+      ) : null}
 
       {error ? <p className={styles.error}>{error}</p> : null}
       {ok ? <p className={styles.ok}>{ok}</p> : null}
@@ -161,9 +216,11 @@ export default function OffersPage() {
         <p className={styles.hint}>Loading…</p>
       ) : !offers.length ? (
         <div className={styles.empty}>
-          <p className={styles.emptyTitle}>No offers here</p>
+          <p className={styles.emptyTitle}>
+            {hasAnyOffers ? "No offers here" : "No offers yet"}
+          </p>
           <p className={styles.hint}>{emptyCopy}</p>
-          {canCreate && statusTab === "all" ? (
+          {canCreate && (!hasAnyOffers || statusTab === "live") ? (
             <Link href="/offers/new" className={styles.btn}>
               <Plus size={16} /> New offer
             </Link>
@@ -172,9 +229,9 @@ export default function OffersPage() {
       ) : (
         <div className={styles.list}>
           {offers.map((o) => {
-            const badge = offerBadge(o.startsAt, o.endsAt);
+            const badge = offerBadge(o.startsAt, o.endsAt, o);
             const range = formatRange(o.startsAt, o.endsAt);
-            const isExpired = Boolean(o.expired);
+            const chip = offerChipLabel(o);
             return (
               <button
                 key={o._id}
@@ -192,40 +249,24 @@ export default function OffersPage() {
                 )}
                 <div className={styles.meta}>
                   <h3>{o.title}</h3>
-                  <p>
-                    {o.project?.name
-                      ? `Project · ${o.project.name}`
-                      : "Global offer"}
-                    {range ? ` · ${range}` : ""}
-                  </p>
+                  <p>{range || "No end date"}</p>
                   <div className={styles.badges}>
-                    {isStaff ? (
-                      <>
-                        <span
-                          className={`${styles.badge} ${
-                            o.active ? styles.badgeOn : styles.badgeOff
-                          }`}
-                        >
-                          {o.active ? "Active" : "Inactive"}
-                        </span>
-                        {isExpired ? (
-                          <span className={`${styles.badge} ${styles.badgeExpire}`}>
-                            Expired
-                          </span>
-                        ) : null}
-                        {o.live ? (
-                          <span className={`${styles.badge} ${styles.badgeOn}`}>
-                            Live
-                          </span>
-                        ) : null}
-                      </>
+                    <span className={`${styles.badge} ${styles.badgeStart}`}>
+                      {chip}
+                    </span>
+                    {statusTab === "inactive" ? (
+                      <span className={`${styles.badge} ${styles.badgeOff}`}>
+                        Inactive
+                      </span>
                     ) : null}
                     {badge ? (
                       <span
                         className={`${styles.badge} ${
-                          badge.kind === "start"
-                            ? styles.badgeStart
-                            : styles.badgeExpire
+                          badge.kind === "expired"
+                            ? styles.badgeExpired
+                            : badge.kind === "start"
+                              ? styles.badgeStart
+                              : styles.badgeExpire
                         }`}
                       >
                         {badge.label}

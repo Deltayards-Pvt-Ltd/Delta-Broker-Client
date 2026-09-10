@@ -41,8 +41,8 @@ export default function EditOfferPage() {
         <div>
           <h1 className={styles.title}>Edit offer</h1>
           <p className={styles.sub}>
-            Update dates or Active anytime. Past end dates auto-deactivate for
-            partners — extend the end date to bring an offer back live.
+            Inactive hides it from partners. Expired is the end date — extend
+            that date, then set Active to bring it back.
           </p>
         </div>
       </div>

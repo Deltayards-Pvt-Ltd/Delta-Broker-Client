@@ -92,86 +92,87 @@ function DateField({ id, label, value, onChange, min, disabled }) {
   );
 }
 
-function ProjectSelect({ id, value, projects, onChange, disabled }) {
+function ProjectSelect({
+  id,
+  value,
+  projects,
+  onChange,
+  disabled,
+  globalOn,
+  onGlobal,
+}) {
   const wrapRef = useRef(null);
   const [open, setOpen] = useState(false);
-  const selected = projects.find((p) => String(p._id) === String(value));
-  const label = selected?.name || "Global";
+  const selectedIds = Array.isArray(value) ? value.map(String) : [];
+  const selected = projects.filter((p) => selectedIds.includes(String(p._id)));
+  const label = globalOn
+    ? "Global"
+    : selected.length === 1
+      ? selected[0].name
+      : selected.length
+        ? `${selected.length} projects`
+        : "Select projects";
 
   useEffect(() => {
     if (!open) return;
     const onDoc = (e) => {
       if (!wrapRef.current?.contains(e.target)) setOpen(false);
     };
-    const onKey = (e) => {
-      if (e.key === "Escape") setOpen(false);
-    };
     document.addEventListener("mousedown", onDoc);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onDoc);
-      document.removeEventListener("keydown", onKey);
-    };
+    return () => document.removeEventListener("mousedown", onDoc);
   }, [open]);
 
-  const pick = (next) => {
-    onChange(next);
-    setOpen(false);
+  const toggle = (pid) => {
+    const sid = String(pid);
+    if (selectedIds.includes(sid)) {
+      onChange(selectedIds.filter((x) => x !== sid));
+    } else {
+      onChange([...selectedIds, sid]);
+    }
   };
 
   return (
-    <div className={styles.projectSelect} ref={wrapRef}>
+    <div className={styles.coverDrop} ref={wrapRef}>
       <button
         type="button"
         id={id}
-        className={styles.dropdownTrigger}
+        className={styles.coverTrigger}
         onClick={() => !disabled && setOpen((v) => !v)}
         disabled={disabled}
-        aria-haspopup="listbox"
-        aria-expanded={open}
       >
         <span>{label}</span>
-        <ChevronDown
-          size={16}
-          className={`${styles.dropdownChevron} ${
-            open ? styles.dropdownChevronOpen : ""
-          }`}
-        />
+        <ChevronDown size={16} />
       </button>
       {open ? (
-        <ul className={styles.selectMenu} role="listbox">
-          <li>
-            <button
-              type="button"
-              role="option"
-              aria-selected={!value}
-              className={`${styles.selectItem} ${
-                !value ? styles.selectItemOn : ""
+        <div className={styles.coverMenu}>
+          <label className={styles.coverRow}>
+            <input
+              type="checkbox"
+              checked={globalOn}
+              onChange={(e) => {
+                onGlobal(e.target.checked);
+                if (e.target.checked) onChange([]);
+              }}
+            />
+            Global
+          </label>
+          {projects.map((p) => (
+            <label
+              key={p._id}
+              className={`${styles.coverRow} ${
+                globalOn ? styles.coverRowOff : ""
               }`}
-              onClick={() => pick("")}
             >
-              Global
-            </button>
-          </li>
-          {projects.map((p) => {
-            const on = String(p._id) === String(value);
-            return (
-              <li key={p._id}>
-                <button
-                  type="button"
-                  role="option"
-                  aria-selected={on}
-                  className={`${styles.selectItem} ${
-                    on ? styles.selectItemOn : ""
-                  }`}
-                  onClick={() => pick(p._id)}
-                >
-                  {p.name}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+              <input
+                type="checkbox"
+                checked={!globalOn && selectedIds.includes(String(p._id))}
+                disabled={globalOn}
+                onChange={() => toggle(p._id)}
+              />
+              {p.name}
+            </label>
+          ))}
+        </div>
       ) : null}
     </div>
   );
@@ -182,13 +183,27 @@ export default function OfferForm({ mode = "create", initial = null }) {
   const imageInputRef = useRef(null);
   const [title, setTitle] = useState(initial?.title || "");
   const [description, setDescription] = useState(initial?.description || "");
-  const [projectId, setProjectId] = useState(
-    initial?.project?._id || initial?.project || ""
-  );
+  const [projectIds, setProjectIds] = useState(() => {
+    const many = Array.isArray(initial?.projects) ? initial.projects : [];
+    if (many.length) {
+      return many.map((p) => String(p._id || p)).filter(Boolean);
+    }
+    const one = initial?.project?._id || initial?.project;
+    return one ? [String(one)] : [];
+  });
+  const [globalOn, setGlobalOn] = useState(() => {
+    const many = Array.isArray(initial?.projects) ? initial.projects : [];
+    return !(many.length || initial?.project?._id || initial?.project);
+  });
   const [active, setActive] = useState(initial?.active !== false);
   const [startsAt, setStartsAt] = useState(toInputDate(initial?.startsAt));
   const [endsAt, setEndsAt] = useState(toInputDate(initial?.endsAt));
   const isEdit = mode === "edit";
+  const endsInPast = useMemo(() => {
+    if (!endsAt) return false;
+    const end = new Date(`${endsAt}T23:59:59`);
+    return !Number.isNaN(end.getTime()) && end < new Date();
+  }, [endsAt]);
   const [sendBroadcast, setSendBroadcast] = useState(false);
   const [projects, setProjects] = useState([]);
   const [busy, setBusy] = useState(false);
@@ -253,6 +268,10 @@ export default function OfferForm({ mode = "create", initial = null }) {
       setError("Title is required.");
       return;
     }
+    if (!globalOn && !projectIds.length) {
+      setError("Pick Global, or tick at least one project.");
+      return;
+    }
     if (startsAt && endsAt && endsAt < startsAt) {
       setError("End date must be on or after the start date.");
       return;
@@ -286,8 +305,8 @@ export default function OfferForm({ mode = "create", initial = null }) {
         description: description.trim(),
         bannerImage,
         link: "",
-        projectId: projectId || null,
-        active,
+        projectIds: globalOn ? [] : projectIds,
+        active: endsInPast ? false : active,
         startsAt: startsAt || null,
         endsAt: endsAt || null,
       };
@@ -386,22 +405,26 @@ export default function OfferForm({ mode = "create", initial = null }) {
       </section>
 
       <section className={styles.section}>
-        <h2 className={styles.sectionTitle}>Project & schedule</h2>
-
+        <h2 className={styles.sectionTitle}>Coverage</h2>
         <div className={styles.field}>
-          <label htmlFor="offer-project">Project</label>
+          <label htmlFor="offer-project">Where it shows</label>
           <ProjectSelect
             id="offer-project"
-            value={projectId}
+            value={projectIds}
             projects={projects}
-            onChange={setProjectId}
+            onChange={setProjectIds}
             disabled={busy}
+            globalOn={globalOn}
+            onGlobal={setGlobalOn}
           />
           <p className={styles.hint}>
-            Global = Offers home. Pick a project to also show it there.
+            Global covers every project. Uncheck it to pick specific ones.
           </p>
         </div>
+      </section>
 
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Schedule</h2>
         <div className={styles.row}>
           <DateField
             id="offer-starts"
@@ -423,22 +446,50 @@ export default function OfferForm({ mode = "create", initial = null }) {
           />
         </div>
         <p className={styles.hint}>
-          Leave blank for no schedule. Future starts still show with a “Starting
-          soon” badge. After the end date the offer auto-deactivates for
-          partners.
+          Blank = no window. After the end date it becomes Expired for
+          partners automatically.
         </p>
+        {endsInPast ? (
+          <p className={styles.error} style={{ margin: 0 }}>
+            Expired. Pick a future end date before you can set Active.
+          </p>
+        ) : null}
+      </section>
 
-        <label className={styles.checkRow}>
-          <input
-            type="checkbox"
-            checked={active}
-            onChange={(e) => setActive(e.target.checked)}
-          />
-          Active (visible to partners)
-        </label>
+      <section className={styles.section}>
+        <h2 className={styles.sectionTitle}>Visibility</h2>
+        <div className={styles.segment} role="radiogroup" aria-label="Visibility">
+          <button
+            type="button"
+            role="radio"
+            aria-checked={active && !endsInPast}
+            className={`${styles.segmentBtn} ${
+              active && !endsInPast ? styles.segmentOn : ""
+            }`}
+            disabled={busy || endsInPast}
+            onClick={() => setActive(true)}
+          >
+            Active
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={!active || endsInPast}
+            className={`${styles.segmentBtn} ${
+              !active || endsInPast ? styles.segmentOn : ""
+            }`}
+            disabled={busy}
+            onClick={() => setActive(false)}
+          >
+            Inactive
+          </button>
+        </div>
         <p className={styles.hint}>
-          Toggle anytime. To bring an expired offer back: extend the end date,
-          then mark Active.
+          {endsInPast
+            ? "Expired offers stay hidden until the end date is extended."
+            : active
+              ? "Partners can see this offer."
+              : "Admin only. Partners will not see it."}
         </p>
       </section>
 

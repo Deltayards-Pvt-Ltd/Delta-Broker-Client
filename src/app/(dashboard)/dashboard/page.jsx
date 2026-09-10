@@ -280,6 +280,10 @@ export default function HomePage() {
                     : "Approve or reject registrations"}
                 </span>
               </Link>
+              <Link href="/analytics" className={styles.quickCard}>
+                <strong>Analytics</strong>
+                <span>Broker joins by year / month</span>
+              </Link>
               <Link href="/brokers" className={styles.quickCard}>
                 <strong>All brokers</strong>
                 <span>Full partner directory</span>
@@ -302,6 +306,10 @@ export default function HomePage() {
               <Link href="/leads" className={styles.quickCard}>
                 <strong>Leads</strong>
                 <span>Clients you referred to Delta Yards</span>
+              </Link>
+              <Link href="/analytics" className={styles.quickCard}>
+                <strong>Analytics</strong>
+                <span>Your leads by status</span>
               </Link>
               <Link href="/offers" className={styles.quickCard}>
                 <strong>Offers</strong>

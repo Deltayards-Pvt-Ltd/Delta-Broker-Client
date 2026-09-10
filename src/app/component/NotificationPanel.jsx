@@ -11,6 +11,7 @@ import {
   ShieldAlert,
   PartyPopper,
   BadgeCheck,
+  User,
 } from "lucide-react";
 import {
   fetchNotifications,
@@ -41,6 +42,8 @@ function typeIcon(type) {
   if (type === "welcome") return PartyPopper;
   if (type === "approved") return BadgeCheck;
   if (type === "broadcast") return Bell;
+  if (type === "lead" || type === "leadCreated" || type === "leadUpdated")
+    return User;
   return Bell;
 }
 
