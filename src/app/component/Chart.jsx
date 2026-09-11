@@ -133,7 +133,7 @@ function Area({ points }) {
   const h = 240;
   const padL = 28;
   const padR = 16;
-  const padT = 18;
+  const padT = 28;
   const padB = 32;
   const innerW = w - padL - padR;
   const innerH = h - padT - padB;
@@ -169,6 +169,14 @@ function Area({ points }) {
               r="4.5"
               fill="#C5A059"
             />
+            <text
+              x={xAt(i)}
+              y={yAt(p.value) - 10}
+              textAnchor="middle"
+              className={styles.areaVal}
+            >
+              {p.value}
+            </text>
             <text
               x={xAt(i)}
               y={h - 10}
