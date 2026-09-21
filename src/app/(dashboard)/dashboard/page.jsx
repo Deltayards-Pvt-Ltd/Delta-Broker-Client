@@ -256,6 +256,10 @@ export default function HomePage() {
         <div className={styles.quickGrid}>
           {isAdmin ? (
             <>
+              <Link href="/analytics" className={styles.quickCard}>
+                <strong>Analytics</strong>
+                <span>Joins & top partners</span>
+              </Link>
               <Link
                 href={isSuper ? "/approvals" : "/brokers/pending"}
                 className={`${styles.quickCard} ${
@@ -295,6 +299,10 @@ export default function HomePage() {
             </>
           ) : (
             <>
+              <Link href="/analytics" className={styles.quickCard}>
+                <strong>Analytics</strong>
+                <span>Your leads by status</span>
+              </Link>
               <Link href="/leads" className={styles.quickCard}>
                 <strong>Leads</strong>
                 <span>Clients you referred to Delta Yards</span>

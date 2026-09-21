@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import {
   approveBroker,
   fetchPendingBrokers,
@@ -99,7 +100,9 @@ export default function ApprovalsPage() {
           {brokers.map((b) => (
             <article key={b._id} className={styles.card}>
               <div className={styles.cardMain}>
-                <h2 className={styles.name}>{b.name}</h2>
+                <h2 className={styles.name}>
+                  <Link href={`/brokers/${b._id}`}>{b.name}</Link>
+                </h2>
                 <p className={styles.meta}>{b.email}</p>
                 <p className={styles.meta}>{b.phone}</p>
                 {b.maharera ? (

@@ -1,10 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Pencil, Search } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { isSuperAdminRole } from "@/lib/roles";
-import { fetchBrokers, disableBroker, enableBroker } from "@/lib/brokerApi";
+import { fetchBrokers, fetchBrokerLeadCount, disableBroker, enableBroker } from "@/lib/brokerApi";
 import Pagination from "@/app/component/Pagination";
 import BrokerEditModal from "@/app/component/BrokerEditModal";
 import styles from "./brokers.module.css";
@@ -45,6 +47,7 @@ export default function BrokerListPage({
   emptyText = "No brokers found.",
 }) {
   const { user } = useAuth();
+  const router = useRouter();
   const canEdit = isSuperAdminRole(user?.role);
   const [brokers, setBrokers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -58,6 +61,7 @@ export default function BrokerListPage({
   const [totalPages, setTotalPages] = useState(1);
   const [editing, setEditing] = useState(null);
   const [togglingId, setTogglingId] = useState(null);
+  const [leadCounts, setLeadCounts] = useState({});
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedQ(query.trim()), 300);
@@ -96,6 +100,27 @@ export default function BrokerListPage({
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    if (!brokers.length) {
+      setLeadCounts({});
+      return;
+    }
+    let alive = true;
+    Promise.all(
+      brokers.map((b) =>
+        fetchBrokerLeadCount(b._id)
+          .then((d) => [b._id, d.leadsCount ?? 0])
+          .catch(() => [b._id, null])
+      )
+    ).then((rows) => {
+      if (!alive) return;
+      setLeadCounts(Object.fromEntries(rows));
+    });
+    return () => {
+      alive = false;
+    };
+  }, [brokers]);
 
   const showStatusFilter = !status;
 
@@ -205,6 +230,7 @@ export default function BrokerListPage({
                 <tr>
                   <th>Partner</th>
                   <th>Membership ID</th>
+                  <th>Leads</th>
                   <th>RERA</th>
                   <th>Phone</th>
                   <th>Member since</th>
@@ -216,15 +242,26 @@ export default function BrokerListPage({
               </thead>
               <tbody>
                 {brokers.map((b) => {
+                  const href = `/brokers/${b._id}`;
                   const firm =
                     b.partnerType === "company"
                       ? b.firmName || "Company"
                       : b.firmName || "Individual";
                   return (
-                    <tr key={b._id}>
+                    <tr
+                      key={b._id}
+                      className={styles.clickRow}
+                      onClick={() => router.push(href)}
+                    >
                       <td>
                         <div className={styles.partnerCell}>
-                          <span className={styles.nameCell}>{b.name}</span>
+                          <Link
+                            href={href}
+                            className={styles.nameLink}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {b.name}
+                          </Link>
                           <span className={styles.subCell}>{firm}</span>
                           {b.email ? (
                             <span className={styles.subCell}>{b.email}</span>
@@ -235,6 +272,14 @@ export default function BrokerListPage({
                         <span className={styles.idCell}>
                           {b.membershipId || "—"}
                         </span>
+                      </td>
+                      <td onClick={(e) => e.stopPropagation()}>
+                        <Link
+                          href={`/brokers/${b._id}/leads`}
+                          className={styles.leadsCell}
+                        >
+                          {leadCounts[b._id] == null ? "…" : leadCounts[b._id]}
+                        </Link>
                       </td>
                       <td>{b.maharera || "—"}</td>
                       <td>{formatPhone(b.phone)}</td>
@@ -255,7 +300,10 @@ export default function BrokerListPage({
                               className={`${styles.switch} ${
                                 isEnabledStatus(b.status) ? styles.switchOn : ""
                               }`}
-                              onClick={() => onToggleAccess(b)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onToggleAccess(b);
+                              }}
                               disabled={Boolean(togglingId)}
                               aria-pressed={isEnabledStatus(b.status)}
                               aria-label={
@@ -281,7 +329,10 @@ export default function BrokerListPage({
                           <button
                             type="button"
                             className={styles.editBtn}
-                            onClick={() => setEditing(b)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditing(b);
+                            }}
                             aria-label={`Edit ${b.name || "broker"}`}
                           >
                             <Pencil size={14} strokeWidth={1.75} />

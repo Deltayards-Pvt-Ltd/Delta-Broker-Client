@@ -10,6 +10,7 @@ export function breadcrumbsFromPath(pathname) {
     updates: "Updates",
     notifications: "Updates",
     leads: "Leads",
+    analytics: "Analytics",
     brokers: "Brokers",
     admins: "Admins",
     projects: "Projects",

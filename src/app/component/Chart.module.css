@@ -1,42 +1,27 @@
 .block {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.65rem;
 }
 
 .head {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
   gap: 0.55rem;
 }
 
 .headTop {
   display: flex;
-  flex-wrap: nowrap;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
 }
 
-.titleRow {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  min-width: 0;
-  flex: 1;
-}
-
-.titleIcon {
-  color: var(--primary);
-  flex-shrink: 0;
-}
-
 .title {
   margin: 0;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--ink);
 }
@@ -45,74 +30,262 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-left: auto;
-  flex-shrink: 0;
 }
 
 .filterBar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: flex-start;
   gap: 0.5rem;
 }
 
 .card {
   position: relative;
-  padding: 2.75rem 1.25rem 1rem;
-  border-radius: 22px;
-  background: var(--plate);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--shadow-card);
+  padding: 3.4rem 1rem 1rem;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  border: 1px solid rgba(197, 160, 89, 0.34);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
 }
 
-.cardPie {
-  padding-top: 1.25rem;
+.cardFlush {
+  padding-top: 1.1rem;
 }
 
 .total {
   position: absolute;
-  top: 1rem;
-  right: 1.25rem;
+  top: 0.75rem;
+  right: 0.75rem;
   z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 0.1rem;
-  margin: 0;
+  padding: 0.35rem 0.75rem;
+  border-radius: 14px;
+  border: 1px solid rgba(197, 160, 89, 0.28);
+  background: var(--surface-muted);
+  text-align: right;
 }
 
-.total span {
-  font-size: 0.7rem;
+.totalLbl {
+  display: block;
+  font-size: 0.625rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--ink-muted);
 }
 
-.total strong {
-  font-size: 1.25rem;
+.totalVal {
+  font-size: 1.35rem;
   font-weight: 800;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.04em;
+  line-height: 1.15;
   color: var(--ink);
-  line-height: 1.1;
-}
-
-.chartBody {
-  width: 100%;
-  height: 280px;
-}
-
-.muted {
-  color: var(--ink-muted);
-  font-size: 0.9375rem;
 }
 
 .empty {
-  padding: 2rem;
-  border: 1px dashed var(--line);
-  border-radius: 14px;
-  background: var(--surface);
+  margin: 0;
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--ink-muted);
+  font-size: 0.9rem;
+}
+
+.plot {
+  min-height: 220px;
+}
+
+.bars {
+  display: flex;
+  align-items: stretch;
+  gap: 0.55rem;
+  height: 220px;
+  padding: 0 0.25rem;
+  overflow-x: auto;
+}
+
+.col {
+  flex: 1 0 36px;
+  min-width: 36px;
+  max-width: 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.topVal {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.track {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  border-radius: 8px 8px 0 0;
+}
+
+.fill {
+  width: 100%;
+  min-height: 0;
+  border-radius: 8px 8px 0 0;
+}
+
+.xLbl {
+  font-size: 0.7rem;
+  font-weight: 500;
   color: var(--ink-muted);
   text-align: center;
+  line-height: 1.2;
+}
+
+.pieWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.25rem 0.5rem;
+}
+
+.donut {
+  position: relative;
+}
+
+.donutCenter {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.donutLbl {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.donutVal {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.legendRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  align-self: stretch;
+  padding: 0.2rem 0.5rem;
+}
+
+.legendDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.legendLbl {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.legendVal {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ink-muted);
+}
+
+.rankWrap {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 220px;
+  gap: 1.35rem;
+  padding: 0.35rem 0.5rem 0.5rem;
+}
+
+.rankRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.rankTop {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.rankBadge {
+  width: 26px;
+  height: 26px;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.rankName {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rankVal {
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.rankTrack {
+  height: 14px;
+  margin-left: 34px;
+  border-radius: 7px;
+  overflow: hidden;
+  background: var(--line);
+}
+
+.rankFill {
+  height: 14px;
+  border-radius: 7px;
+}
+
+.areaSvg {
+  width: 100%;
+  height: 240px;
+  display: block;
+}
+
+.areaLbl {
+  fill: var(--ink-muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.areaVal {
+  fill: var(--ink);
+  font-size: 11px;
+  font-weight: 700;
 }

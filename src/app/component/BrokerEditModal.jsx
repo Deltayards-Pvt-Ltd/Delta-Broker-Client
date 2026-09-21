@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { X } from "lucide-react";
-import { updateBroker } from "@/lib/brokerApi";
+import { updateBroker, fetchBrokerLeadCount } from "@/lib/brokerApi";
 import { fetchCategories } from "@/lib/categoryApi";
 import styles from "./BrokerEditModal.module.css";
 
@@ -27,6 +28,7 @@ export default function BrokerEditModal({ broker, open, onClose, onSaved }) {
   const [categories, setCategories] = useState([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [leadsCount, setLeadsCount] = useState(null);
 
   useEffect(() => {
     if (!open || !broker) return;
@@ -44,6 +46,11 @@ export default function BrokerEditModal({ broker, open, onClose, onSaved }) {
     fetchCategories()
       .then((data) => setCategories(data.categories || []))
       .catch(() => setCategories([]));
+
+    setLeadsCount(null);
+    fetchBrokerLeadCount(broker._id)
+      .then((d) => setLeadsCount(d.leadsCount ?? 0))
+      .catch(() => setLeadsCount(null));
   }, [open, broker]);
 
   useEffect(() => {
@@ -126,6 +133,16 @@ export default function BrokerEditModal({ broker, open, onClose, onSaved }) {
             {broker.membershipId ? (
               <p className={styles.meta}>{broker.membershipId}</p>
             ) : null}
+            <Link
+              href={`/brokers/${broker._id}/leads`}
+              className={styles.leadsMeta}
+              onClick={onClose}
+            >
+              Leads{" "}
+              <strong>
+                {leadsCount == null ? "…" : leadsCount}
+              </strong>
+            </Link>
           </div>
           <button
             type="button"

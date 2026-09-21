@@ -16,6 +16,12 @@ function leadQs(extra = {}) {
   if (extra.statusId) qs.set("statusId", extra.statusId);
   if (extra.page) qs.set("page", String(extra.page));
   if (extra.limit) qs.set("limit", String(extra.limit));
+  if (extra.startDate) qs.set("startDate", extra.startDate);
+  if (extra.endDate) qs.set("endDate", extra.endDate);
+  if (extra.mode) qs.set("mode", extra.mode);
+  if (extra.year) qs.set("year", String(extra.year));
+  if (extra.fromYear) qs.set("fromYear", String(extra.fromYear));
+  if (extra.toYear) qs.set("toYear", String(extra.toYear));
   return qs.toString();
 }
 
@@ -70,4 +76,15 @@ export async function fetchLeadFilterMeta(opts = {}) {
   if (opts.endDate) qs.set("endDate", opts.endDate);
   const q = qs.toString();
   return apiGet(`/api/leads/meta${q ? `?${q}` : ""}`);
+}
+
+/** GET /api/leads/fc-series — booking-date FC counts by month/year */
+export async function fetchFcSeries(opts = {}) {
+  const qs = new URLSearchParams();
+  if (opts.mode) qs.set("mode", opts.mode);
+  if (opts.year) qs.set("year", String(opts.year));
+  if (opts.fromYear) qs.set("fromYear", String(opts.fromYear));
+  if (opts.toYear) qs.set("toYear", String(opts.toYear));
+  const q = qs.toString();
+  return apiGet(`/api/leads/fc-series${q ? `?${q}` : ""}`);
 }

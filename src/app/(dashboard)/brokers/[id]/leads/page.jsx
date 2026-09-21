@@ -2,19 +2,22 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import {
   ArrowRight,
   Building2,
   Calendar,
+  ChevronLeft,
   Phone,
   Search,
   Users,
 } from "lucide-react";
 import Pagination from "@/app/component/Pagination";
 import {
-  fetchLeadFilterMeta,
-  fetchLeadsForChannelPartner,
-} from "@/lib/leadApi";
+  fetchBroker,
+  fetchBrokerLeads,
+  fetchBrokerLeadsMeta,
+} from "@/lib/brokerApi";
 import {
   formatLeadDate,
   leadName,
@@ -23,11 +26,21 @@ import {
   leadStatus,
   statusBadgeColors,
 } from "@/lib/leadDisplay";
-import styles from "./leads.module.css";
+import styles from "../../../leads/leads.module.css";
 
 const PAGE_SIZE = 20;
 
-export default function LeadsPage() {
+function partnerLabel(broker) {
+  if (!broker) return "";
+  const isCompany = String(broker.partnerType || "").toLowerCase() === "company";
+  return isCompany
+    ? broker.firmName || broker.name || ""
+    : broker.name || "";
+}
+
+export default function BrokerLeadsPage() {
+  const { id } = useParams();
+  const [partner, setPartner] = useState(null);
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -43,6 +56,17 @@ export default function LeadsPage() {
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
+    setPartner(null);
+    setQuery("");
+    setDebouncedQ("");
+    setProjectFilter("");
+    setStatusFilter("");
+    setPage(1);
+    setLeads([]);
+    setError("");
+  }, [id]);
+
+  useEffect(() => {
     const t = setTimeout(() => setDebouncedQ(query.trim()), 300);
     return () => clearTimeout(t);
   }, [query]);
@@ -52,22 +76,40 @@ export default function LeadsPage() {
   }, [debouncedQ, projectFilter, statusFilter, limit]);
 
   useEffect(() => {
-    fetchLeadFilterMeta()
+    if (!id) return;
+    let alive = true;
+    fetchBroker(id)
+      .then((data) => {
+        if (alive) setPartner(data.broker || null);
+      })
+      .catch(() => {
+        if (alive) setPartner(null);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [id]);
+
+  useEffect(() => {
+    if (!id) return;
+    fetchBrokerLeadsMeta(id)
       .then((data) => {
         setProjects(data.projects || []);
         setStatuses(data.statuses || []);
+        if (data.broker) setPartner((prev) => prev || data.broker);
       })
       .catch(() => {
         setProjects([]);
         setStatuses([]);
       });
-  }, []);
+  }, [id]);
 
   const load = useCallback(async () => {
+    if (!id) return;
     setLoading(true);
     setError("");
     try {
-      const data = await fetchLeadsForChannelPartner({
+      const data = await fetchBrokerLeads(id, {
         page,
         limit,
         q: debouncedQ || undefined,
@@ -77,6 +119,7 @@ export default function LeadsPage() {
       setLeads(data.leads || []);
       setTotal(data.count ?? data.pagination?.totalItems ?? 0);
       setTotalPages(data.totalPages ?? data.pagination?.totalPages ?? 1);
+      if (data.broker) setPartner((prev) => prev || data.broker);
     } catch (err) {
       setError(err.message || "Failed to load leads");
       setLeads([]);
@@ -85,7 +128,7 @@ export default function LeadsPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, limit, debouncedQ, projectFilter, statusFilter]);
+  }, [id, page, limit, debouncedQ, projectFilter, statusFilter]);
 
   useEffect(() => {
     load();
@@ -96,13 +139,23 @@ export default function LeadsPage() {
       ? "No leads found. Try a different search or clear the filters."
       : "No leads yet.";
 
+  const label = partnerLabel(partner);
+  const membershipId = partner?.membershipId || "";
+
   return (
     <div className={styles.page}>
+      <Link href={`/brokers/${id}`} className={styles.back}>
+        <ChevronLeft size={18} strokeWidth={2} />
+        Partner
+      </Link>
+
       <header className={styles.listHeaderRow}>
         <div className={styles.listHeader}>
-          <p className={styles.eyebrow}>Referrals</p>
+          <p className={styles.eyebrow}>{label || "Partner"}</p>
           <h1 className={styles.title}>Leads</h1>
-          <p className={styles.copy}>Clients you referred to Delta Yards</p>
+          <p className={styles.copy}>
+            {membershipId || "Clients this partner referred to Delta Yards"}
+          </p>
         </div>
         <div className={styles.countPill} title="Matching leads">
           {loading ? "—" : total}
@@ -169,7 +222,7 @@ export default function LeadsPage() {
               return (
                 <Link
                   key={lead._id}
-                  href={`/leads/${lead._id}`}
+                  href={`/brokers/${id}/leads/${lead._id}`}
                   className={styles.card}
                 >
                   <span
@@ -224,7 +277,8 @@ export default function LeadsPage() {
                         <div className={styles.metaText}>
                           <span className={styles.metaLabel}>Created</span>
                           <span className={styles.metaValue}>
-                            {formatLeadDate(lead.createdAt || lead.updatedAt) || "—"}
+                            {formatLeadDate(lead.createdAt || lead.updatedAt) ||
+                              "—"}
                           </span>
                         </div>
                       </div>
