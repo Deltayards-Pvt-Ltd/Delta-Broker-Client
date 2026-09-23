@@ -362,7 +362,7 @@ export default function BrokerDetailsPage() {
           <section className={styles.panel}>
             <InfoRow
               icon={Users}
-              label="Leads"
+              label="Visits"
               value={leadsCount == null ? "…" : String(leadsCount)}
               href={`/brokers/${broker._id}/leads`}
             />

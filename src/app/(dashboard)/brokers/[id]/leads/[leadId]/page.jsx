@@ -1,17 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import {
   Banknote,
   Building2,
-  CalendarClock,
   CalendarPlus,
   ChevronDown,
   ChevronLeft,
   ChevronUp,
-  CircleCheck,
   Flag,
   GitBranch,
   Landmark,
@@ -27,15 +25,16 @@ import {
 import { fetchBrokerLead } from "@/lib/brokerApi";
 import {
   extraFieldIcon,
+  FALLBACK_STATUS_COLOR,
   formatLeadDate,
+  formatLeadDateTime,
   formatOnDate,
-  leadActivities,
   leadExtraFields,
   leadName,
   leadPhone,
   leadProject,
   leadStatus,
-  statusBadgeColors,
+  statusColor,
 } from "@/lib/leadDisplay";
 import styles from "../../../../leads/leads.module.css";
 
@@ -65,14 +64,6 @@ function initials(name) {
   return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
 }
 
-function ActivityIcon({ kind }) {
-  const props = { size: 14, strokeWidth: 2 };
-  if (kind === "visit") return <MapPin {...props} />;
-  if (kind === "followup") return <CalendarClock {...props} />;
-  if (kind === "booking") return <CircleCheck {...props} />;
-  return <Flag {...props} />;
-}
-
 function ExtraIcon({ name }) {
   const Icon = EXTRA_ICONS[name] || Tag;
   return <Icon size={18} strokeWidth={1.75} />;
@@ -87,29 +78,43 @@ function ActivityList({ items }) {
     <div className={styles.activityCard}>
       {visible.map((item, i) => {
         const last = i === visible.length - 1 && !(hidden && !expanded);
-        const tone = item.statusName ? statusBadgeColors(item.statusName) : null;
+        const color = item.color || FALLBACK_STATUS_COLOR;
         return (
-          <div key={item.id} className={styles.activityRow}>
+          <div key={`${item.updatedAt}-${i}`} className={styles.activityRow}>
             <div className={styles.activityRail}>
               <span className={styles.activityNode}>
-                <ActivityIcon kind={item.kind} />
+                <Flag size={14} strokeWidth={2} />
               </span>
               {!last ? <span className={styles.activityLine} /> : null}
             </div>
             <div className={styles.activityBody}>
               <p className={styles.activityWhen}>
-                {formatOnDate(item.at) || "Date unavailable"}
+                {formatOnDate(item.updatedAt) || "Date unavailable"}
               </p>
-              {item.statusName ? (
+              {item.name ? (
                 <span
                   className={styles.statusChip}
-                  style={{ background: tone?.bg, color: tone?.text }}
+                  style={{ background: color, color: "#fff" }}
                 >
-                  {item.statusName}
+                  {item.name}
                 </span>
               ) : null}
-              {item.sentence ? (
-                <p className={styles.activityMeta}>{item.sentence}</p>
+              {item.nextDate ? (
+                <p className={styles.activityMeta}>
+                  Next date: {formatLeadDateTime(item.nextDate)}
+                </p>
+              ) : null}
+              {item.remark ? (
+                <p className={styles.activityNote}>
+                  <span className={styles.activityNoteLabel}>Remark</span>
+                  {item.remark}
+                </p>
+              ) : null}
+              {item.optionalRemark ? (
+                <p className={styles.activityNote}>
+                  <span className={styles.activityNoteLabel}>Optional remark</span>
+                  {item.optionalRemark}
+                </p>
               ) : null}
             </div>
           </div>
@@ -160,15 +165,15 @@ export default function BrokerLeadDetailsPage() {
   const project = leadProject(lead);
   const status = leadStatus(lead);
   const extras = leadExtraFields(lead);
-  const activities = useMemo(() => leadActivities(lead), [lead]);
+  const activities = lead?.statusChanges || [];
   const created = formatLeadDate(lead?.createdAt);
-  const badge = statusBadgeColors(lead?.currentStatus || status);
+  const badgeColor = statusColor(lead?.currentStatus);
 
   return (
     <div className={styles.page}>
       <Link href={`/brokers/${id}/leads`} className={styles.back}>
         <ChevronLeft size={18} strokeWidth={2} />
-        Leads
+        Visits
       </Link>
 
       {loading ? <p className={styles.muted}>Loading…</p> : null}
@@ -213,7 +218,7 @@ export default function BrokerLeadDetailsPage() {
             {status ? (
               <span
                 className={styles.statusPill}
-                style={{ background: badge.bg, color: badge.text }}
+                style={{ background: badgeColor, color: "#fff" }}
               >
                 {status.toUpperCase()}
               </span>

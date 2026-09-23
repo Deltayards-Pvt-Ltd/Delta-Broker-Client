@@ -5,10 +5,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronDown, X } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { useTheme } from "@/context/ThemeContext";
 import { NAV_ITEMS, navForRole } from "@/lib/nav";
 import { isStaffRole, staffLabel } from "@/lib/roles";
 import { NavIcon } from "@/app/component/NavIcon";
 import { useStaffPendingCount } from "@/lib/usePendingCount";
+import { brandLogoMarkSrc } from "@/lib/brand";
 import styles from "./Sidebar.module.css";
 
 function isExactActive(pathname, href) {
@@ -45,6 +47,7 @@ function CountBadge({ count }) {
 export default function Sidebar({ open, onClose, persistent }) {
   const pathname = usePathname();
   const { user } = useAuth();
+  const { isLight } = useTheme();
   const role = user?.role || "broker";
   const items = navForRole(NAV_ITEMS, role);
   const [expanded, setExpanded] = useState({});
@@ -99,7 +102,7 @@ export default function Sidebar({ open, onClose, persistent }) {
           <div className={styles.brandBlock}>
             <span className={styles.logoMark} aria-hidden>
               <img
-                src="/new_logo.png"
+                src={brandLogoMarkSrc(isLight)}
                 alt=""
                 className={styles.logoImg}
                 width={28}

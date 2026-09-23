@@ -24,7 +24,7 @@ import {
   leadPhone,
   leadProject,
   leadStatus,
-  statusBadgeColors,
+  statusColor,
 } from "@/lib/leadDisplay";
 import styles from "../../../leads/leads.module.css";
 
@@ -152,7 +152,7 @@ export default function BrokerLeadsPage() {
       <header className={styles.listHeaderRow}>
         <div className={styles.listHeader}>
           <p className={styles.eyebrow}>{label || "Partner"}</p>
-          <h1 className={styles.title}>Leads</h1>
+          <h1 className={styles.title}>Visits</h1>
           <p className={styles.copy}>
             {membershipId || "Clients this partner referred to Delta Yards"}
           </p>
@@ -218,7 +218,7 @@ export default function BrokerLeadsPage() {
               const phone = leadPhone(lead);
               const project = leadProject(lead);
               const status = leadStatus(lead);
-              const tone = statusBadgeColors(lead.currentStatus || status);
+              const color = statusColor(lead.currentStatus);
               return (
                 <Link
                   key={lead._id}
@@ -227,7 +227,7 @@ export default function BrokerLeadsPage() {
                 >
                   <span
                     className={styles.statusRail}
-                    style={{ background: tone.bg }}
+                    style={{ background: color }}
                     aria-hidden
                   />
                   <div className={styles.body}>
@@ -251,7 +251,7 @@ export default function BrokerLeadsPage() {
                       {status ? (
                         <span
                           className={styles.statusBadge}
-                          style={{ background: tone.bg, color: tone.text }}
+                          style={{ background: color, color: "#fff" }}
                         >
                           {status}
                         </span>
