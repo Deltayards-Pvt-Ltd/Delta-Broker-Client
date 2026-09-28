@@ -475,6 +475,10 @@
   grid-template-columns: minmax(0, 280px);
 }
 
+.statsPair {
+  grid-template-columns: repeat(2, minmax(0, 280px));
+}
+
 @media (max-width: 640px) {
   .stats {
     grid-template-columns: 1fr;

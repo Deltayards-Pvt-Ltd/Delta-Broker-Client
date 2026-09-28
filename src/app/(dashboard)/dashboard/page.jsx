@@ -17,6 +17,7 @@ import { isBrokerRole, isStaffRole, isSuperAdminRole } from "@/lib/roles";
 import MembershipCard from "@/app/component/MembershipCard";
 import { fetchDashboardSummary } from "@/lib/dashboardApi";
 import { fetchLeadCountForChannelPartner } from "@/lib/leadApi";
+import { fetchProjects } from "@/lib/projectApi";
 import {
   publishPendingFromSummary,
   useStaffPendingCount,
@@ -76,6 +77,7 @@ export default function HomePage() {
   });
   const [recentProjects, setRecentProjects] = useState([]);
   const [leadsCount, setLeadsCount] = useState(0);
+  const [projectsCount, setProjectsCount] = useState(0);
 
   useEffect(() => {
     if (!isBroker) return;
@@ -84,11 +86,18 @@ export default function HomePage() {
     (async () => {
       setLoading(true);
       try {
-        const data = await fetchLeadCountForChannelPartner();
+        const [leads, projects] = await Promise.all([
+          fetchLeadCountForChannelPartner(),
+          fetchProjects({ page: 1, limit: 1 }),
+        ]);
         if (!alive) return;
-        setLeadsCount(data.leadsCount ?? data.count ?? 0);
+        setLeadsCount(leads.leadsCount ?? leads.count ?? 0);
+        setProjectsCount(projects.count ?? 0);
       } catch {
-        if (alive) setLeadsCount(0);
+        if (alive) {
+          setLeadsCount(0);
+          setProjectsCount(0);
+        }
       } finally {
         if (alive) setLoading(false);
       }
@@ -235,7 +244,16 @@ export default function HomePage() {
             maharera={user?.maharera}
             status={user?.status}
           />
-          <div className={`${styles.stats} ${styles.statsSingle}`}>
+          <div className={`${styles.stats} ${styles.statsPair}`}>
+            <StatCard
+              href="/projects"
+              icon={FolderKanban}
+              label="Projects"
+              value={n(projectsCount)}
+              hint="Active inventory"
+              tone="toneWarn"
+              card="cardAmber"
+            />
             <StatCard
               href="/leads"
               icon={Users}
