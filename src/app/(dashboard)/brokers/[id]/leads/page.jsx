@@ -38,6 +38,10 @@ function partnerLabel(broker) {
     : broker.name || "";
 }
 
+function compactDcpId(value) {
+  return String(value || "").replace(/[^A-Za-z0-9]/g, "").toUpperCase();
+}
+
 export default function BrokerLeadsPage() {
   const { id } = useParams();
   const [partner, setPartner] = useState(null);
@@ -140,7 +144,7 @@ export default function BrokerLeadsPage() {
       : "No leads yet.";
 
   const label = partnerLabel(partner);
-  const membershipId = partner?.membershipId || "";
+  const membershipId = compactDcpId(partner?.membershipId);
 
   return (
     <div className={styles.page}>

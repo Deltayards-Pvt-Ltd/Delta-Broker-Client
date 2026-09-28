@@ -3,10 +3,10 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Pencil, Search } from "lucide-react";
+import { Pencil, Search, Trash2 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { isSuperAdminRole } from "@/lib/roles";
-import { fetchBrokers, fetchBrokerLeadCount, disableBroker, enableBroker } from "@/lib/brokerApi";
+import { fetchBrokers, fetchBrokerLeadCount, disableBroker, enableBroker, deleteBroker } from "@/lib/brokerApi";
 import Pagination from "@/app/component/Pagination";
 import BrokerEditModal from "@/app/component/BrokerEditModal";
 import styles from "./brokers.module.css";
@@ -20,6 +20,10 @@ function formatDate(value) {
     month: "short",
     year: "numeric",
   });
+}
+
+function compactDcpId(value) {
+  return String(value || "").replace(/[^A-Za-z0-9]/g, "").toUpperCase();
 }
 
 function formatPhone(phone) {
@@ -61,6 +65,7 @@ export default function BrokerListPage({
   const [totalPages, setTotalPages] = useState(1);
   const [editing, setEditing] = useState(null);
   const [togglingId, setTogglingId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
   const [leadCounts, setLeadCounts] = useState({});
 
   useEffect(() => {
@@ -180,6 +185,26 @@ export default function BrokerListPage({
     }
   };
 
+  const onDelete = async (broker) => {
+    if (!canEdit || deletingId) return;
+    const ok = window.confirm(
+      `Delete “${broker.name || "this broker"}”? This cannot be undone.`
+    );
+    if (!ok) return;
+
+    setDeletingId(broker._id);
+    setError("");
+    try {
+      await deleteBroker(broker._id);
+      if (editing?._id === broker._id) setEditing(null);
+      await load();
+    } catch (err) {
+      setError(err.message || "Delete failed");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   return (
     <div className={styles.page}>
       <header className={styles.header}>
@@ -270,7 +295,7 @@ export default function BrokerListPage({
                       </td>
                       <td>
                         <span className={styles.idCell}>
-                          {b.membershipId || "—"}
+                          {compactDcpId(b.membershipId) || "—"}
                         </span>
                       </td>
                       <td onClick={(e) => e.stopPropagation()}>
@@ -326,18 +351,33 @@ export default function BrokerListPage({
                       ) : null}
                       {canEdit ? (
                         <td>
-                          <button
-                            type="button"
-                            className={styles.editBtn}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setEditing(b);
-                            }}
-                            aria-label={`Edit ${b.name || "broker"}`}
-                          >
-                            <Pencil size={14} strokeWidth={1.75} />
-                            Edit
-                          </button>
+                          <div className={styles.rowActions}>
+                            <button
+                              type="button"
+                              className={styles.editBtn}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setEditing(b);
+                              }}
+                              aria-label={`Edit ${b.name || "broker"}`}
+                            >
+                              <Pencil size={14} strokeWidth={1.75} />
+                              Edit
+                            </button>
+                            <button
+                              type="button"
+                              className={styles.deleteBtn}
+                              disabled={deletingId === b._id}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onDelete(b);
+                              }}
+                              aria-label={`Delete ${b.name || "broker"}`}
+                            >
+                              <Trash2 size={14} strokeWidth={2} />
+                              {deletingId === b._id ? "…" : "Delete"}
+                            </button>
+                          </div>
                         </td>
                       ) : null}
                     </tr>

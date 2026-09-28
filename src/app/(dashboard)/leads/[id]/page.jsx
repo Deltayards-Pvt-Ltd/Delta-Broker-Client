@@ -104,6 +104,12 @@ function ActivityList({ items }) {
                   Next date: {formatLeadDateTime(item.nextDate)}
                 </p>
               ) : null}
+              {item.conversation ? (
+                <p className={styles.activityNote}>
+                  <span className={styles.activityNoteLabel}>Conversation summary</span>
+                  {item.conversation}
+                </p>
+              ) : null}
               {item.remark ? (
                 <p className={styles.activityNote}>
                   <span className={styles.activityNoteLabel}>Remark</span>
