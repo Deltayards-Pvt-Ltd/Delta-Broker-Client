@@ -46,7 +46,7 @@ export default function PendingPage() {
       <div className={`${styles.brandHero}`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/delta_logo_with_text-1.png"
+          src="/delta_logo_with_text.png"
           alt="Delta Yards"
           className={styles.brandHeroImg}
         />
