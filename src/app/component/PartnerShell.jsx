@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { brandLogoMarkSrc } from "@/lib/brand";
 import styles from "./PartnerShell.module.css";
 
 export default function PartnerShell({
@@ -30,16 +31,15 @@ export default function PartnerShell({
             <span />
           ) : (
             <Link href={isPending ? "/pending" : "/"} className={styles.brand}>
-              {isLight ? (
-                <Image
-                  src="/new_logo.png"
-                  alt="Delta Yards"
-                  width={48}
-                  height={48}
-                  className={styles.brandMark}
-                  priority
-                />
-              ) : (
+              <Image
+                src={brandLogoMarkSrc(isLight)}
+                alt="Delta Yards"
+                width={48}
+                height={48}
+                className={styles.brandMark}
+                priority
+              />
+              {!isLight ? (
                 <>
                   <span className={styles.brandWordmark}>
                     <span className={styles.brandDelta}>DELTA</span>{" "}
@@ -47,7 +47,7 @@ export default function PartnerShell({
                   </span>
                   <span className={styles.brandTag}>Channel Partner Platform</span>
                 </>
-              )}
+              ) : null}
             </Link>
           )}
 

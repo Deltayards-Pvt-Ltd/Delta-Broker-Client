@@ -20,7 +20,7 @@ function ChangePasswordAuth() {
       <div className={styles.appTheme}>
         <div className={styles.brandHero}>
           <Image
-            src="/loo_with_text.png"
+            src="/delta_logo_with_text-1.png"
             alt="Delta Yards Channel Partner"
             width={220}
             height={132}

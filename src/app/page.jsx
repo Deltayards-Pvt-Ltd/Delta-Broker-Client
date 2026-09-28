@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { getPostLoginPath } from "@/lib/auth";
+import { brandLogoMarkSrc } from "@/lib/brand";
 import styles from "./page.module.css";
 
 const STEPS = [
@@ -39,7 +40,7 @@ export default function LandingPage() {
         <header className={`${styles.header} ${styles.reveal}`}>
           <Link href="/" className={styles.brand}>
             <Image
-              src="/new_logo.png"
+              src={brandLogoMarkSrc(false)}
               alt="Delta Yards"
               width={48}
               height={48}

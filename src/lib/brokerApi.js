@@ -88,6 +88,14 @@ export async function enableBroker(id) {
   return parse(res);
 }
 
+export async function deleteBroker(id) {
+  const res = await fetch(`${API_URL}/api/brokers/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
+  return parse(res);
+}
+
 export async function fetchBrokerLeadCount(id) {
   const res = await fetch(`${API_URL}/api/brokers/${id}/leads-count`, {
     headers: authHeaders(),

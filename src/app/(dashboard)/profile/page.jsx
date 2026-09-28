@@ -19,6 +19,10 @@ function formatDate(date) {
   });
 }
 
+function compactDcpId(value) {
+  return String(value || "").replace(/[^A-Za-z0-9]/g, "").toUpperCase();
+}
+
 function capitalize(v) {
   if (!v) return "—";
   const s = String(v);
@@ -90,7 +94,7 @@ export default function AccountPage() {
             <div className={styles.cardMain}>
               <p className={styles.label}>Membership</p>
               <p className={styles.membershipId}>
-                {user?.membershipId || "—"}
+                {compactDcpId(user?.membershipId) || "—"}
               </p>
               <p className={styles.subtitle}>
                 Valid till {formatDate(user?.membershipValidTill)}

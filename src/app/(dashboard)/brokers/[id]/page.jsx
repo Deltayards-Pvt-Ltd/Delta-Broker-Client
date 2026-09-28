@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   Award,
   Building2,
@@ -15,6 +15,7 @@ import {
   Mail,
   Pencil,
   Phone,
+  Trash2,
   Users,
   User,
   XCircle,
@@ -24,6 +25,7 @@ import { isSuperAdminRole } from "@/lib/roles";
 import {
   disableBroker,
   enableBroker,
+  deleteBroker,
   fetchBroker,
   fetchBrokerLeadCount,
 } from "@/lib/brokerApi";
@@ -39,6 +41,10 @@ function formatDate(value) {
     month: "short",
     year: "numeric",
   });
+}
+
+function compactDcpId(value) {
+  return String(value || "").replace(/[^A-Za-z0-9]/g, "").toUpperCase();
 }
 
 function formatPhone(phone) {
@@ -133,6 +139,7 @@ function VerifyBadge({ label, verified }) {
 
 export default function BrokerDetailsPage() {
   const { id } = useParams();
+  const router = useRouter();
   const { user } = useAuth();
   const canEdit = isSuperAdminRole(user?.role);
   const [broker, setBroker] = useState(null);
@@ -141,6 +148,7 @@ export default function BrokerDetailsPage() {
   const [error, setError] = useState("");
   const [editing, setEditing] = useState(false);
   const [toggling, setToggling] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const load = useCallback(async () => {
     if (!id) return;
@@ -201,6 +209,24 @@ export default function BrokerDetailsPage() {
     }
   };
 
+  const onDelete = async () => {
+    if (!broker || !canEdit || deleting) return;
+    const ok = window.confirm(
+      `Delete “${broker.name || "this broker"}”? This cannot be undone.`
+    );
+    if (!ok) return;
+
+    setDeleting(true);
+    setError("");
+    try {
+      await deleteBroker(broker._id);
+      router.replace("/brokers");
+    } catch (err) {
+      setError(err.message || "Delete failed");
+      setDeleting(false);
+    }
+  };
+
   const isCompany =
     String(broker?.partnerType || "").toLowerCase() === "company";
   const title = isCompany
@@ -251,7 +277,7 @@ export default function BrokerDetailsPage() {
               <p className={styles.heroSub}>{broker.name}</p>
             ) : null}
             <p className={styles.heroMembershipId}>
-              {broker.membershipId || "No membership id"}
+              {compactDcpId(broker.membershipId) || "No membership id"}
             </p>
 
             <div className={styles.heroChips}>
@@ -304,6 +330,15 @@ export default function BrokerDetailsPage() {
                 >
                   <Pencil size={14} strokeWidth={1.75} />
                   Edit
+                </button>
+                <button
+                  type="button"
+                  className={styles.deleteBtn}
+                  disabled={deleting}
+                  onClick={onDelete}
+                >
+                  <Trash2 size={14} strokeWidth={2} />
+                  {deleting ? "…" : "Delete"}
                 </button>
               </div>
             ) : null}
@@ -362,7 +397,7 @@ export default function BrokerDetailsPage() {
           <section className={styles.panel}>
             <InfoRow
               icon={Users}
-              label="Leads"
+              label="Visits"
               value={leadsCount == null ? "…" : String(leadsCount)}
               href={`/brokers/${broker._id}/leads`}
             />
@@ -370,7 +405,7 @@ export default function BrokerDetailsPage() {
             <InfoRow
               icon={CreditCard}
               label="Membership id"
-              value={broker.membershipId}
+              value={compactDcpId(broker.membershipId)}
             />
             <div className={styles.divider} />
             <InfoRow

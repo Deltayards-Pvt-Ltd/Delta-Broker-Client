@@ -44,7 +44,7 @@ export const NAV_ITEMS = [
   },
   {
     id: "leads",
-    label: "Leads",
+    label: "Visits",
     href: "/leads",
     icon: "contact",
     roles: [ROLES.BROKER],
@@ -165,7 +165,7 @@ export const TOP_TABS = [
   },
   {
     id: "leads",
-    label: "Leads",
+    label: "Visits",
     href: "/leads",
     roles: [ROLES.BROKER],
   },

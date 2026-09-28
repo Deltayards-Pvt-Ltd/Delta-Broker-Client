@@ -23,6 +23,10 @@ function categoryIdsFromBroker(broker) {
     .filter(Boolean);
 }
 
+function compactDcpId(value) {
+  return String(value || "").replace(/[^A-Za-z0-9]/g, "").toUpperCase();
+}
+
 export default function BrokerEditModal({ broker, open, onClose, onSaved }) {
   const [form, setForm] = useState(EMPTY);
   const [categories, setCategories] = useState([]);
@@ -63,6 +67,8 @@ export default function BrokerEditModal({ broker, open, onClose, onSaved }) {
   }, [open, saving, onClose]);
 
   if (!open || !broker) return null;
+
+  const dcpId = compactDcpId(broker.membershipId);
 
   const setField = (key, value) => {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -130,9 +136,7 @@ export default function BrokerEditModal({ broker, open, onClose, onSaved }) {
             <h2 id="broker-edit-title" className={styles.title}>
               {broker.name || "Broker"}
             </h2>
-            {broker.membershipId ? (
-              <p className={styles.meta}>{broker.membershipId}</p>
-            ) : null}
+            {dcpId ? <p className={styles.meta}>{dcpId}</p> : null}
             <Link
               href={`/brokers/${broker._id}/leads`}
               className={styles.leadsMeta}

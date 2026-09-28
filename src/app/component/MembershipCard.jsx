@@ -23,6 +23,16 @@ function formatPhone(phone) {
   return `+91 ${phone}`;
 }
 
+function compactDcpId(value) {
+  return String(value || "").replace(/[^A-Za-z0-9]/g, "").toUpperCase();
+}
+
+function formatDcpId(value) {
+  const c = compactDcpId(value);
+  const m = c.match(/^([A-Z]+)(\d{4})(\d{5})$/);
+  return m ? `${m[1]}-${m[2]}-${m[3]}` : c;
+}
+
 export default function MembershipCard({
   membershipId,
   name,
@@ -70,7 +80,7 @@ export default function MembershipCard({
       <div className={styles.fields}>
         <div className={styles.fieldFull}>
           <span className={styles.label}>Membership ID</span>
-          <span className={styles.value}>{membershipId || "—"}</span>
+          <span className={styles.value}>{formatDcpId(membershipId) || "—"}</span>
         </div>
 
         <div className={styles.row}>

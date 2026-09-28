@@ -72,13 +72,14 @@ export default function OffersPage() {
   const sections = isStaff ? STAFF_SECTIONS : SECTIONS;
   const scopeMeta = SCOPES.find((t) => t.id === scopeTab) || SCOPES[0];
   const sectionMeta = sections.find((t) => t.id === statusTab) || SECTIONS[0];
-  const scope = isStaff ? scopeMeta.scope : undefined;
-  const filter = isStaff ? sectionMeta.filter : "live";
+  const scope = scopeMeta.scope;
+  const filter = sectionMeta.filter;
   const hasAnyOffers =
     buckets.active +
-      (isStaff ? buckets.expired + (buckets.inactive || 0) : 0) >
+      buckets.expired +
+      (isStaff ? buckets.inactive || 0 : 0) >
     0;
-  const showFilters = isStaff && hasAnyOffers;
+  const filteredEmpty = scopeTab !== "all" || statusTab !== "live";
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -98,6 +99,10 @@ export default function OffersPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    if (!sections.some((t) => t.id === statusTab)) setStatusTab("live");
+  }, [sections, statusTab]);
 
   useEffect(() => {
     if (!scopeOpen) return;
@@ -124,16 +129,25 @@ export default function OffersPage() {
   };
 
   const emptyCopy = useMemo(() => {
-    if (isBroker) return "Check back soon for partner incentives.";
-    if (!hasAnyOffers) {
-      return "Create a global or project offer for channel partners.";
+    if (!hasAnyOffers && !filteredEmpty) {
+      return isBroker
+        ? "Check back soon for partner incentives."
+        : "Create a global or project offer for channel partners.";
     }
     const scopeLabel =
       scopeTab === "all" ? "" : `${scopeMeta.label.toLowerCase()} `;
     if (statusTab === "expired") return `No expired ${scopeLabel}offers.`;
-    if (statusTab === "inactive") return "No paused offers. Inactive is hidden from partners.";
+    if (statusTab === "inactive")
+      return "No paused offers. Inactive is hidden from partners.";
     return `No ${scopeLabel}offers right now.`;
-  }, [hasAnyOffers, isBroker, statusTab, scopeTab, scopeMeta.label]);
+  }, [
+    filteredEmpty,
+    hasAnyOffers,
+    isBroker,
+    statusTab,
+    scopeTab,
+    scopeMeta.label,
+  ]);
 
   return (
     <div className={styles.page}>
@@ -142,7 +156,7 @@ export default function OffersPage() {
           <h1 className={styles.title}>Offers</h1>
           <p className={styles.sub}>
             {isBroker
-              ? "Schemes and incentives from Delta Yards."
+              ? "Active and expired schemes from Delta Yards."
               : "Active is live for partners. Inactive is admin-only. Expired is past the end date."}
           </p>
         </div>
@@ -153,7 +167,6 @@ export default function OffersPage() {
         ) : null}
       </div>
 
-      {!loading && showFilters ? (
       <div className={styles.filterRow}>
         <div className={styles.segment} role="tablist" aria-label="Offer status">
           {sections.map((t) => (
@@ -207,7 +220,6 @@ export default function OffersPage() {
           ) : null}
         </div>
       </div>
-      ) : null}
 
       {error ? <p className={styles.error}>{error}</p> : null}
       {ok ? <p className={styles.ok}>{ok}</p> : null}
@@ -217,7 +229,7 @@ export default function OffersPage() {
       ) : !offers.length ? (
         <div className={styles.empty}>
           <p className={styles.emptyTitle}>
-            {hasAnyOffers ? "No offers here" : "No offers yet"}
+            {hasAnyOffers || filteredEmpty ? "No offers here" : "No offers yet"}
           </p>
           <p className={styles.hint}>{emptyCopy}</p>
           {canCreate && (!hasAnyOffers || statusTab === "live") ? (

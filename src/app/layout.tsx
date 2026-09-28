@@ -15,6 +15,10 @@ const firaSans = Fira_Sans({
 export const metadata: Metadata = {
   title: "DCP · Channel Partner Platform",
   description: "Delta Yards Channel Partner Platform (DCP)",
+  icons: {
+    icon: "/delta_logo.png",
+    apple: "/delta_logo.png",
+  },
 };
 
 export default function RootLayout({

@@ -213,6 +213,37 @@ a.leadsCell:hover {
   border-color: rgba(197, 160, 89, 0.5);
 }
 
+.rowActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.deleteBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 34px;
+  padding: 0 0.7rem;
+  border-radius: 9px;
+  border: 1px solid var(--danger-border);
+  background: transparent;
+  color: var(--danger);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.deleteBtn:hover:not(:disabled) {
+  background: var(--danger-bg);
+}
+
+.deleteBtn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .switch {
   position: relative;
   width: 42px;
@@ -446,6 +477,10 @@ a.leadsCell:hover {
 
 .hero .editBtn {
   color: var(--primary);
+}
+
+.hero .deleteBtn {
+  color: var(--danger);
 }
 
 .statusChip {
