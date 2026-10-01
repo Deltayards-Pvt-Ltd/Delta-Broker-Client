@@ -127,6 +127,12 @@ export const NAV_ITEMS = [
     ],
   },
   {
+    id: "policy",
+    label: "Policy",
+    href: "/policy",
+    icon: "folder",
+  },
+  {
     id: "profile",
     label: "Account",
     href: "/profile",
@@ -230,6 +236,7 @@ export function canAccessPath(pathname, role) {
       pathname === "/dashboard" ||
       pathname === "/analytics" ||
       pathname === "/profile" ||
+      pathname === "/policy" ||
       pathname === "/profile/password" ||
       pathname === "/password-reset" ||
       pathname === "/password-reset/change" ||
@@ -255,6 +262,7 @@ export function canAccessPath(pathname, role) {
   if (pathname === "/dashboard") return true;
   if (pathname === "/analytics") return true;
   if (pathname === "/profile") return true;
+  if (pathname === "/policy") return true;
   if (pathname === "/profile/password") return true;
   if (pathname === "/analytics" || pathname.startsWith("/analytics/")) return true;
   if (pathname === "/updates") return true;

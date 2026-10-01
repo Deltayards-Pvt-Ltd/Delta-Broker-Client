@@ -75,6 +75,18 @@
   font-weight: 650;
 }
 
+.wrapView {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.wrapView .paperShell {
+  flex: 1;
+  height: auto;
+  min-height: 0;
+}
+
 .paperShell {
   height: min(52vh, 480px);
   min-height: 320px;

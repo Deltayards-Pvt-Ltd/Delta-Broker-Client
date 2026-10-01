@@ -150,6 +150,8 @@
   flex: 1;
   min-height: 0;
   width: 100%;
+  display: flex;
+  flex-direction: column;
   overflow-x: hidden;
   overflow-y: auto;
   padding: 1.25rem 1rem 2rem;
@@ -157,9 +159,13 @@
 }
 
 .contentInner {
+  flex: 1;
+  min-height: 0;
   width: 100%;
   max-width: var(--content-max);
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
 }
 
 @media (min-width: 960px) {
