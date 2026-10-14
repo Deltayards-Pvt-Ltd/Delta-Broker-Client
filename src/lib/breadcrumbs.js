@@ -13,6 +13,7 @@ export function breadcrumbsFromPath(pathname) {
     analytics: "Analytics",
     brokers: "Brokers",
     admins: "Admins",
+    "app-version": "App version",
     projects: "Projects",
     offers: "Offers",
     profile: "Account",

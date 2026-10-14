@@ -75,6 +75,13 @@ export const NAV_ITEMS = [
     roles: [ROLES.SUPER_ADMIN],
   },
   {
+    id: "app-version",
+    label: "App version",
+    href: "/app-version",
+    icon: "phone",
+    roles: [ROLES.SUPER_ADMIN],
+  },
+  {
     id: "projects",
     label: "Projects",
     icon: "folder",
@@ -185,6 +192,12 @@ export const TOP_TABS = [
     id: "admins",
     label: "Admins",
     href: "/admins",
+    roles: [ROLES.SUPER_ADMIN],
+  },
+  {
+    id: "app-version",
+    label: "App version",
+    href: "/app-version",
     roles: [ROLES.SUPER_ADMIN],
   },
   { id: "projects", label: "Projects", href: "/projects" },

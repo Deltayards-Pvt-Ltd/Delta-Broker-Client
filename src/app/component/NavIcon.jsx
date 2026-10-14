@@ -8,6 +8,7 @@ import {
   Gift,
   ContactRound,
   BarChart3,
+  Smartphone,
 } from "lucide-react";
 
 const ICONS = {
@@ -20,6 +21,7 @@ const ICONS = {
   gift: Gift,
   contact: ContactRound,
   chart: BarChart3,
+  phone: Smartphone,
 };
 
 export function NavIcon({ name, size = 18 }) {
