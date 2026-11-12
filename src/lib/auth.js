@@ -30,6 +30,20 @@ export function clearSession() {
   localStorage.removeItem(USER_KEY);
 }
 
+/** Broker self-delete — wipes account + personal data on the server */
+export async function deleteMyAccount() {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/api/auth/me`, {
+    method: "DELETE",
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.message || "Failed to delete account");
+  return data;
+}
+
 export function isAuthenticated() {
   return Boolean(getToken());
 }

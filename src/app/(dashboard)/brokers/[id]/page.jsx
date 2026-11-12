@@ -375,6 +375,12 @@ export default function BrokerDetailsPage() {
                 <div className={styles.divider} />
               </>
             ) : null}
+            {canEdit && broker.panNumber ? (
+              <>
+                <InfoRow icon={Award} label="PAN" value={broker.panNumber} />
+                <div className={styles.divider} />
+              </>
+            ) : null}
             <InfoRow icon={Award} label="MahaRERA" value={broker.maharera} />
             {cats.length ? (
               <>

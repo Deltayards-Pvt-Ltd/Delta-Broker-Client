@@ -105,6 +105,9 @@ export default function ApprovalsPage() {
                 </h2>
                 <p className={styles.meta}>{b.email}</p>
                 <p className={styles.meta}>{b.phone}</p>
+                {b.panNumber ? (
+                  <p className={styles.meta}>PAN: {b.panNumber}</p>
+                ) : null}
                 {b.maharera ? (
                   <p className={styles.meta}>MahaRERA: {b.maharera}</p>
                 ) : null}

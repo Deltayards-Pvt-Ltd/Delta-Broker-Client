@@ -22,10 +22,13 @@ const emptyForm = {
   firmName: "",
   email: "",
   phone: "",
+  panNumber: "",
   maharera: "",
 };
 
 const OTP_MS = 2 * 60 * 1000;
+const PAN_RE = /^[A-Z]{5}[0-9]{4}[A-Z]$/;
+const COMPANY_PAN_4TH = "CFHATBLJG";
 
 function formatRemain(ms) {
   const total = Math.max(0, Math.ceil(ms / 1000));
@@ -34,12 +37,23 @@ function formatRemain(ms) {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
+function isValidPan(raw, partnerType) {
+  const value = String(raw || "")
+    .replace(/\s+/g, "")
+    .toUpperCase();
+  if (!PAN_RE.test(value)) return false;
+  const fourth = value[3];
+  if (partnerType === "company") return COMPANY_PAN_4TH.includes(fourth);
+  return fourth === "P";
+}
+
 export default function RegisterForm({
   step = 1,
   onStepChange,
   onPendingDone,
 }) {
   const [form, setForm] = useState(emptyForm);
+  const [panConsent, setPanConsent] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [termsRead, setTermsRead] = useState(false);
   const [error, setError] = useState("");
@@ -286,13 +300,17 @@ export default function RegisterForm({
     }
   };
 
+  const panOk = isValidPan(form.panNumber, form.partnerType);
+
   const canGoNext =
     form.name.trim() &&
     emailOk &&
     phoneOk &&
     emailVerified &&
     phoneVerified &&
-    (!isCompany || form.firmName.trim());
+    (!isCompany || form.firmName.trim()) &&
+    panOk &&
+    panConsent;
 
   const goToTermsStep = (e) => {
     e.preventDefault();
@@ -301,7 +319,11 @@ export default function RegisterForm({
       setError(
         isCompany && !form.firmName.trim()
           ? "Enter firm name for company registration"
-          : "Complete details and verify email & mobile to continue"
+          : !panOk
+            ? "Enter a valid PAN to continue"
+            : !panConsent
+              ? "Confirm the PAN disclosure to continue"
+              : "Complete details and verify email & mobile to continue"
       );
       return;
     }
@@ -321,6 +343,10 @@ export default function RegisterForm({
       setError("Accept the terms to continue");
       return;
     }
+    if (!panOk || !panConsent) {
+      setError("PAN and disclosure consent are required");
+      return;
+    }
 
     setSubmitting(true);
     try {
@@ -328,6 +354,7 @@ export default function RegisterForm({
         name: form.name.trim(),
         email: form.email.trim().toLowerCase(),
         phone: form.phone.trim(),
+        panNumber: form.panNumber.replace(/\s+/g, "").toUpperCase(),
         maharera: form.maharera.trim() || undefined,
         partnerType: form.partnerType,
         firmName: isCompany ? form.firmName.trim() : undefined,
@@ -633,6 +660,51 @@ export default function RegisterForm({
                 hint: phoneHint,
               })}
             </div>
+          </div>
+
+          <div className={styles.field}>
+            <label htmlFor="panNumber">
+              {isCompany ? "Company PAN" : "PAN"}
+            </label>
+            <input
+              id="panNumber"
+              type="text"
+              autoComplete="off"
+              value={form.panNumber}
+              onChange={(e) =>
+                setField(
+                  "panNumber",
+                  e.target.value.replace(/\s+/g, "").toUpperCase().slice(0, 10)
+                )
+              }
+              placeholder={isCompany ? "ABCCD1234F" : "ABCPD1234F"}
+              maxLength={10}
+              required
+            />
+            {form.panNumber.length > 0 && !panOk ? (
+              <p className={styles.fieldError}>
+                {isCompany
+                  ? "Enter a valid company PAN (4th letter C, F, etc.)"
+                  : "Enter a valid individual PAN (4th letter P)"}
+              </p>
+            ) : null}
+            <p className={styles.panDisclosure}>
+              We collect your {isCompany ? "company " : ""}PAN to verify your
+              channel-partner identity for admin approval. It is visible only to
+              Delta Yards superadmins, stored securely, and never shown publicly
+              or used for marketing.
+            </p>
+            <label className={styles.panConsent}>
+              <input
+                type="checkbox"
+                checked={panConsent}
+                onChange={(e) => setPanConsent(e.target.checked)}
+              />
+              <span>
+                I understand and agree to provide my{" "}
+                {isCompany ? "company " : ""}PAN for partner verification.
+              </span>
+            </label>
           </div>
         </>
       ) : (

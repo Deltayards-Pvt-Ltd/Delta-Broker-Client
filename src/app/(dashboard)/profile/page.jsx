@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { deleteMyAccount } from "@/lib/auth";
 import { isStaffRole, isBrokerRole, staffLabel } from "@/lib/roles";
 import { APP_VERSION } from "@/lib/constants";
 import styles from "./page.module.css";
@@ -50,6 +51,7 @@ export default function AccountPage() {
   const router = useRouter();
   const { user, logout } = useAuth();
   const [loggingOut, setLoggingOut] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const isStaff = isStaffRole(user?.role);
   const isBroker = isBrokerRole(user?.role);
@@ -59,13 +61,30 @@ export default function AccountPage() {
     user?.name || (isStaff ? "Admin" : null) || user?.email || "—";
 
   const onLogout = async () => {
-    if (loggingOut) return;
+    if (loggingOut || deleting) return;
     setLoggingOut(true);
     try {
       await logout();
       router.replace("/login");
     } finally {
       setLoggingOut(false);
+    }
+  };
+
+  const onDeleteAccount = async () => {
+    if (!isBroker || deleting || loggingOut) return;
+    const ok = window.confirm(
+      "Delete your account permanently? This removes your name, email, phone, PAN, and all profile data from Delta Yards. This cannot be undone."
+    );
+    if (!ok) return;
+    setDeleting(true);
+    try {
+      await deleteMyAccount();
+      await logout();
+      router.replace("/login");
+    } catch (err) {
+      window.alert(err.message || "Failed to delete account");
+      setDeleting(false);
     }
   };
 
@@ -126,6 +145,12 @@ export default function AccountPage() {
             />
           </div>
 
+          {user?.panNumber ? (
+            <div className={styles.metaExtra}>
+              <MetaCell label="PAN" value={user.panNumber} />
+            </div>
+          ) : null}
+
           {rera ? (
             <div className={styles.metaExtra}>
               <MetaCell label="RERA" value={rera} />
@@ -159,10 +184,21 @@ export default function AccountPage() {
           type="button"
           className={styles.logoutBtn}
           onClick={onLogout}
-          disabled={loggingOut}
+          disabled={loggingOut || deleting}
         >
           {loggingOut ? "Logging out…" : "Log out"}
         </button>
+
+        {isBroker ? (
+          <button
+            type="button"
+            className={styles.deleteBtn}
+            onClick={onDeleteAccount}
+            disabled={deleting || loggingOut}
+          >
+            {deleting ? "Deleting…" : "Delete account"}
+          </button>
+        ) : null}
       </div>
 
       <p className={styles.version}>Delta Yards · v{APP_VERSION}</p>
